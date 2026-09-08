@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment Status Dashboard — Live</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0c111d;--card:#151c2d;--card2:#1c2540;--line:#28324c;--ink:#eaf0ff;--mut:#8592b5;
+  --full:#3dd68c;--rem:#ff9f5a;--pend:#ff5d73;--acc:#6b8cff;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;padding:20px 16px 50px}
+.wrap{max-width:860px;margin:0 auto}
+h1{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;letter-spacing:-.4px}
+h1 span{color:var(--acc)}
+.sub{color:var(--mut);font-size:13px;margin:3px 0 18px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 16px;position:relative;overflow:hidden}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--full)}
+.kpi.r::before{background:var(--rem)}.kpi.p::before{background:var(--pend)}.kpi.a::before{background:var(--acc)}
+.kpi .l{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.kpi .v{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;margin-top:5px;transition:color .3s}
+.kpi .v.flash{color:var(--acc)}
+.kpi .n{font-size:11.5px;color:var(--mut);margin-top:2px}
+.addbar{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:16px}
+.addbar h3{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;margin-bottom:3px}
+.addbar .cap{color:var(--mut);font-size:12px;margin-bottom:14px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.field label{display:block;font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:5px}
+.field input,.field select{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:11px 12px;color:var(--ink);font-size:15px;font-family:inherit}
+.field input:focus,.field select:focus{outline:none;border-color:var(--acc)}
+.pendprev{font-size:12.5px;color:var(--mut);margin-bottom:12px}
+.pendprev b{font-family:'Space Grotesk',sans-serif}
+.pendprev .due{color:var(--rem)}.pendprev .clr{color:var(--full)}
+.addbtn{width:100%;background:var(--acc);color:#06101f;border:none;border-radius:11px;padding:13px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer}
+.addbtn:active{transform:scale(.99)}
+.addbtn:disabled{opacity:.6}
+.newrec{display:none;margin-top:2px;margin-bottom:10px}
+.newrec.show{display:block}
+.recman{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);display:flex;gap:10px;align-items:flex-end}
+.recman .field{flex:1}
+.mbtn{background:var(--card2);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:11px 16px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap}
+.mbtn:active{transform:scale(.98)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:14px}
+.card h3{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600}
+.card .cap{color:var(--mut);font-size:12px;margin:2px 0 14px}
+.box{position:relative;height:400px}.box.md{height:340px}
+.sec{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;margin:24px 2px 10px}
+.rec{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:10px;overflow:hidden}
+.rec .head{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer}
+.rec .nm{font-weight:700;font-size:15px;flex:1}
+.rec .stat{font-size:12px;color:var(--mut)}
+.rec .amt{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--pend);font-size:15px}
+.rec .rdel{background:none;border:none;color:var(--mut);font-size:15px;cursor:pointer;padding:2px 4px}
+.rec .rdel:hover{color:var(--pend)}
+.rec .chev{color:var(--mut);transition:.2s;font-size:13px}
+.rec.open .chev{transform:rotate(90deg)}
+.cfm{border:none;border-radius:8px;padding:5px 11px;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer}
+.cfm.yes{background:var(--pend);color:#fff}.cfm.no{background:var(--card2);color:var(--mut);border:1px solid var(--line)}
+.warn{font-size:12px;color:var(--pend);flex:1}
+.mini{height:6px;border-radius:6px;background:var(--card2);overflow:hidden;width:56px;flex-shrink:0}
+.mini i{display:block;height:100%;background:var(--full)}
+.body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.rec.open .body{max-height:2000px}
+.stu{display:flex;align-items:center;gap:8px;padding:10px 16px;border-top:1px solid var(--line);font-size:13.5px;flex-wrap:wrap}
+.stu .snm{flex:1;min-width:90px}
+.stu .snm .tag{font-size:9.5px;background:rgba(107,140,255,.18);color:var(--acc);padding:1px 6px;border-radius:10px;margin-left:6px;vertical-align:middle}
+.stu .paid{color:var(--full);font-variant-numeric:tabular-nums;font-size:12.5px}
+.stu .owe{color:var(--pend);font-weight:700;font-variant-numeric:tabular-nums;min-width:56px;text-align:right}
+.stu .full{color:var(--full);font-weight:700;font-size:12px;min-width:56px;text-align:right}
+.stu .rcpt{background:var(--card2);border:1px solid var(--line);color:var(--acc);font-size:11.5px;font-weight:700;cursor:pointer;flex-shrink:0;padding:6px 10px;border-radius:8px}
+.stu .rcpt:hover{border-color:var(--acc)}
+.stu .del{background:var(--card2);border:1px solid var(--line);color:var(--mut);font-size:16px;cursor:pointer;flex-shrink:0;line-height:1;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center}
+.stu .del:hover,.stu .del:active{color:#fff;background:var(--pend);border-color:var(--pend)}
+.none{padding:12px 16px;border-top:1px solid var(--line);color:var(--mut);font-size:13px}
+.foot{text-align:center;color:var(--mut);font-size:11px;margin-top:22px;line-height:1.8}
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--full);color:#04120a;font-weight:700;font-size:14px;padding:11px 18px;border-radius:12px;opacity:0;pointer-events:none;transition:.25s;z-index:50}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.err{background:var(--pend);color:#fff}
+.connbar{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--mut);margin-bottom:12px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--full)}
+.dot.off{background:var(--pend)}
+
+/* ---- Receipt modal ---- */
+#rcptOverlay{position:fixed;inset:0;background:rgba(4,8,16,.72);display:none;align-items:flex-start;justify-content:center;padding:26px 14px;overflow-y:auto;z-index:100}
+#rcptOverlay.show{display:flex}
+.rcptCard{background:#fff;color:#14192b;width:100%;max-width:440px;border-radius:14px;overflow:hidden;font-family:'Inter',sans-serif}
+.rcptHead{background:#0b3d91;color:#fff;padding:18px 20px}
+.rcptHead .co{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px}
+.rcptHead .meta{font-size:10.5px;opacity:.85;margin-top:4px;line-height:1.6}
+.rcptBody{padding:18px 20px}
+.rcptTitle{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+.rcptTitle b{font-family:'Space Grotesk',sans-serif;font-size:15px}
+.rcptTitle span{font-size:11px;color:#6b7280}
+.rrow{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px dashed #e5e7eb}
+.rrow.tot{border-bottom:none;border-top:2px solid #14192b;margin-top:6px;padding-top:10px;font-weight:700;font-size:14.5px}
+.rrow .lbl{color:#6b7280}
+.rgroup{margin:14px 0}
+.rgroup h4{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;margin-bottom:4px}
+.rstatus{margin-top:14px;padding:10px 12px;border-radius:10px;font-size:12.5px;font-weight:700;text-align:center}
+.rstatus.full{background:#e7f9ef;color:#1a9c58}
+.rstatus.due{background:#fff1ec;color:#d6491f}
+.rbtns{display:flex;gap:10px;padding:0 20px 20px}
+.rbtns button{flex:1;border:none;border-radius:10px;padding:12px;font-size:13.5px;font-weight:700;font-family:inherit;cursor:pointer}
+.rbtns .close{background:#eef0f5;color:#333}
+.rbtns .print{background:#0b3d91;color:#fff}
+@media print{
+  body *{visibility:hidden}
+  #rcptOverlay,#rcptOverlay *{visibility:visible}
+  #rcptOverlay{position:absolute;inset:auto;top:0;left:0;background:#fff;padding:0}
+  .rbtns{display:none}
+  .rcptCard{max-width:100%;border-radius:0}
+}
+@media(max-width:560px){.frow{grid-template-columns:1fr}.recman{flex-direction:column;align-items:stretch}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Payment <span>Status</span> — Live</h1>
+  <div class="sub">Add & remove candidates and recruiters — data is saved on the server, so it's the same on every device · fee ₹5,000/student</div>
+  <div class="connbar"><span class="dot" id="connDot"></span><span id="connText">Connecting to server…</span></div>
+
+  <div class="addbar">
+    <h3>➕ Add a candidate</h3>
+    <div class="cap">Pick recruiter, enter student & amount paid. Pending auto-calculates.</div>
+    <div class="frow">
+      <div class="field"><label>Recruiter</label><select id="fRec"></select></div>
+      <div class="field"><label>Candidate name</label><input id="fName" placeholder="e.g. Rahul K" autocomplete="off"></div>
+    </div>
+    <div class="field newrec" id="newRecWrap"><label>New recruiter name</label><input id="fNewRec" placeholder="Type new recruiter" autocomplete="off"></div>
+    <div class="frow">
+      <div class="field"><label>Course fee (₹, incl. 18% GST)</label><input id="fFee" type="number" value="5000" inputmode="numeric"></div>
+      <div class="field"><label>Amount paid (₹)</label><input id="fPaid" type="number" placeholder="0" inputmode="numeric"></div>
+    </div>
+    <div class="pendprev" id="pendPrev">Pending: <b class="due">₹5,000</b></div>
+    <button class="addbtn" id="addBtn">Add candidate & update dashboard</button>
+
+    <div class="recman">
+      <div class="field"><label>Add an empty recruiter (no candidates yet)</label><input id="fAddRec" placeholder="New recruiter name" autocomplete="off"></div>
+      <button class="mbtn" id="addRecBtn">+ Add recruiter</button>
+    </div>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="card">
+    <h3>Full paid vs remaining — by recruiter</h3>
+    <div class="cap">Green = cleared · Orange = still owe. Updates live.</div>
+    <div class="box"><canvas id="splitChart"></canvas></div>
+  </div>
+  <div class="card">
+    <h3>Pending amount to collect — by recruiter</h3>
+    <div class="cap">₹ still to recover from each recruiter's students</div>
+    <div class="box md"><canvas id="pendChart"></canvas></div>
+  </div>
+
+  <div class="sec">Recruiters & candidates — tap to expand · 🧾 receipt · 🗑 to remove</div>
+  <div id="recList"></div>
+
+  <div class="foot" id="foot"></div>
+</div>
+<div id="toast"></div>
+
+<!-- Receipt modal -->
+<div id="rcptOverlay">
+  <div class="rcptCard" id="rcptCard"></div>
+</div>
+
+<script>
+const API = ''; // same origin — set to e.g. 'https://your-app.onrender.com' if the frontend is hosted separately
+const inr = v => '₹' + Number(v).toLocaleString('en-IN', {maximumFractionDigits:2});
+const FEE_DEFAULT = 5000;
+
+let DB = { students: [], recruiters: [] };
+let pendingDeleteRec = null;
+
+async function api(path, opts) {
+  const res = await fetch(API + path, Object.assign({ headers: { 'Content-Type': 'application/json' } }, opts));
+  if (!res.ok) { const e = await res.json().catch(()=>({error:'Request failed'})); throw new Error(e.error || 'Request failed'); }
+  return res.json();
+}
+
+async function loadData() {
+  try {
+    DB = await api('/api/data');
+    setConn(true);
+    fillRecs();
+    render();
+  } catch (e) {
+    setConn(false);
+  }
+}
+function setConn(ok){
+  document.getElementById('connDot').classList.toggle('off', !ok);
+  document.getElementById('connText').textContent = ok ? 'Connected — data synced across all devices' : 'Can\'t reach the server — start it with "npm start"';
+}
+
+function allStudents(){ return DB.students; }
+function activeRecruiters(){ return [...DB.recruiters].sort(); }
+
+Chart.defaults.color='#8592b5'; Chart.defaults.font.family='Inter'; Chart.defaults.font.size=11;
+const gx={color:'rgba(40,50,76,.6)'}, gn={display:false};
+const splitChart=new Chart(document.getElementById('splitChart'),{type:'bar',
+  data:{labels:[],datasets:[{label:'Paid full',data:[],backgroundColor:'#3dd68c',borderRadius:4,barThickness:18},{label:'Remaining',data:[],backgroundColor:'#ff9f5a',borderRadius:4,barThickness:18}]},
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,animation:{duration:400},plugins:{legend:{position:'top',labels:{boxWidth:12,padding:12}},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+c.raw+' students'}}},scales:{x:{stacked:true,grid:gx,ticks:{stepSize:1}},y:{stacked:true,grid:gn}}}});
+const pendChart=new Chart(document.getElementById('pendChart'),{type:'bar',
+  data:{labels:[],datasets:[{data:[],backgroundColor:[],borderRadius:4,barThickness:20}]},
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,animation:{duration:400},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+inr(c.raw)+' pending'}}},scales:{x:{grid:gx,ticks:{callback:v=>'₹'+v/1000+'k'}},y:{grid:gn}}}});
+
+function aggregate(){
+  const map={};
+  activeRecruiters().forEach(r=>map[r]={recruiter:r,total:0,full:0,remaining:0,pending_amt:0,collected:0,remaining_list:[],full_list:[]});
+  allStudents().forEach(s=>{
+    if(!map[s.recruiter]) map[s.recruiter]={recruiter:s.recruiter,total:0,full:0,remaining:0,pending_amt:0,collected:0,remaining_list:[],full_list:[]};
+    const m=map[s.recruiter]; m.total++; m.collected+=s.paid;
+    if(s.pending>0){ m.remaining++; m.pending_amt+=s.pending; m.remaining_list.push(s); }
+    else { m.full++; m.full_list.push(s); }
+  });
+  return Object.values(map).sort((a,b)=>b.remaining-a.remaining||b.pending_amt-a.pending_amt||b.collected-a.collected||a.recruiter.localeCompare(b.recruiter));
+}
+function flash(el){ if(el){el.classList.add('flash'); setTimeout(()=>el.classList.remove('flash'),450);} }
+
+function render(justAdded){
+  const R=aggregate();
+  const totF=R.reduce((s,r)=>s+r.full,0), totR=R.reduce((s,r)=>s+r.remaining,0);
+  const totP=R.reduce((s,r)=>s+r.pending_amt,0), totC=R.reduce((s,r)=>s+r.collected,0);
+  const totS=totF+totR;
+  document.getElementById('kpis').innerHTML=
+   `<div class="kpi"><div class="l">Paid in full</div><div class="v" id="kF">${totF}</div><div class="n">of ${totS} students</div></div>
+    <div class="kpi r"><div class="l">Have to pay</div><div class="v" id="kR">${totR}</div><div class="n">still owe balance</div></div>
+    <div class="kpi p"><div class="l">Total pending</div><div class="v" id="kP">${inr(totP)}</div><div class="n">to collect</div></div>
+    <div class="kpi a"><div class="l">Collected</div><div class="v" id="kC">${inr(totC)}</div><div class="n">${R.length} recruiters</div></div>`;
+  if(justAdded){ ['kF','kR','kP','kC'].forEach(id=>flash(document.getElementById(id))); }
+  splitChart.data.labels=R.map(r=>r.recruiter);
+  splitChart.data.datasets[0].data=R.map(r=>r.full);
+  splitChart.data.datasets[1].data=R.map(r=>r.remaining);
+  splitChart.update();
+  const P=R.filter(r=>r.pending_amt>0);
+  pendChart.data.labels=P.map(r=>r.recruiter);
+  pendChart.data.datasets[0].data=P.map(r=>r.pending_amt);
+  pendChart.data.datasets[0].backgroundColor=P.map(r=>r.pending_amt>=8000?'#ff5d73':r.pending_amt>=4000?'#ff9f5a':'#ffc94d');
+  pendChart.update();
+  const openSet=new Set([...document.querySelectorAll('.rec.open')].map(e=>e.dataset.r));
+  document.getElementById('recList').innerHTML = R.map(r=>{
+    const pct=r.total?Math.round(r.full/r.total*100):0;
+    const rows=r.remaining_list.sort((a,b)=>b.pending-a.pending).map(st=>
+      `<div class="stu"><span class="snm">${st.name}</span><span class="paid">₹${st.paid.toLocaleString('en-IN')} paid</span><span class="owe">₹${st.pending.toLocaleString('en-IN')}</span><button class="rcpt" data-rcpt="${st.id}">🧾 Receipt</button><button class="del" data-delid="${st.id}" title="Delete candidate">×</button></div>`).join('');
+    const fulls=r.full_list.map(st=>
+      `<div class="stu"><span class="snm">${st.name}</span><span class="paid">₹${st.paid.toLocaleString('en-IN')} paid</span><span class="full">✓ full</span><button class="rcpt" data-rcpt="${st.id}">🧾 Receipt</button><button class="del" data-delid="${st.id}" title="Delete candidate">×</button></div>`).join('');
+    const body=(rows+fulls)||`<div class="none">No candidates yet — add one above</div>`;
+    let head;
+    if(pendingDeleteRec===r.recruiter){
+      head=`<span class="warn">Delete “${r.recruiter}”${r.total?` and ${r.total} candidate(s)`:''}?</span>
+        <button class="cfm yes" data-rdelyes="${r.recruiter}">Delete</button>
+        <button class="cfm no" data-rdelno="1">Cancel</button>`;
+    } else {
+      head=`<div class="mini"><i style="width:${pct}%"></i></div>
+        <div class="nm">${r.recruiter}</div>
+        <div class="stat">${r.full}/${r.total} full · <b style="color:var(--rem)">${r.remaining} owe</b></div>
+        <div class="amt">${r.pending_amt>0?inr(r.pending_amt):'—'}</div>
+        <button class="rdel" data-rdel="${r.recruiter}" title="Remove recruiter">🗑</button>
+        <div class="chev">▶</div>`;
+    }
+    return `<div class="rec ${openSet.has(r.recruiter)?'open':''}" data-r="${r.recruiter}"><div class="head">${head}</div><div class="body">${body}</div></div>`;
+  }).join('');
+
+  document.getElementById('foot').innerHTML=`${inr(totP)} outstanding · ${totR} owe · ${totS} students · ${R.length} recruiters<br>Live — synced to the server, visible from any device.`;
+}
+
+const fRec=document.getElementById('fRec');
+function fillRecs(){
+  const recs=activeRecruiters();
+  fRec.innerHTML=recs.map(r=>`<option>${r}</option>`).join('')+'<option value="__new">➕ New recruiter…</option>';
+}
+fRec.onchange=()=>document.getElementById('newRecWrap').classList.toggle('show',fRec.value==='__new');
+function updatePrev(){
+  const fee=+document.getElementById('fFee').value||0, paid=+document.getElementById('fPaid').value||0;
+  const pend=Math.max(0,fee-paid);
+  document.getElementById('pendPrev').innerHTML = pend>0 ? `Pending: <b class="due">${inr(pend)}</b>` : `<b class="clr">✓ Paid in full — nothing pending</b>`;
+}
+document.getElementById('fFee').oninput=updatePrev;
+document.getElementById('fPaid').oninput=updatePrev;
+
+document.getElementById('addBtn').onclick=async ()=>{
+  let rec=fRec.value;
+  if(rec==='__new'){ rec=document.getElementById('fNewRec').value.trim(); if(!rec){toast('Enter recruiter name',true);return;} }
+  const name=document.getElementById('fName').value.trim();
+  if(!name){ toast('Enter candidate name',true); return; }
+  const fee=+document.getElementById('fFee').value||FEE_DEFAULT;
+  const paid=+document.getElementById('fPaid').value||0;
+  const btn=document.getElementById('addBtn'); btn.disabled=true;
+  try{
+    await api('/api/students',{method:'POST',body:JSON.stringify({recruiter:rec,name,fee,paid})});
+    document.getElementById('fName').value=''; document.getElementById('fPaid').value='';
+    document.getElementById('fNewRec').value=''; document.getElementById('newRecWrap').classList.remove('show');
+    updatePrev();
+    await loadData();
+    fRec.value=rec;
+    render(true); toast('Added '+name+' → '+rec);
+  }catch(e){ toast(e.message,true); }
+  btn.disabled=false;
+};
+document.getElementById('addRecBtn').onclick=async ()=>{
+  const r=document.getElementById('fAddRec').value.trim();
+  if(!r){toast('Enter recruiter name',true);return;}
+  if(activeRecruiters().includes(r)){toast(r+' already exists',true);return;}
+  try{
+    await api('/api/recruiters',{method:'POST',body:JSON.stringify({name:r})});
+    document.getElementById('fAddRec').value='';
+    await loadData();
+    toast('Added recruiter '+r);
+  }catch(e){ toast(e.message,true); }
+};
+let toastT; function toast(m,isErr){const t=document.getElementById('toast');t.textContent=m;t.classList.toggle('err',!!isErr);t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),1900);}
+
+async function deleteCandidate(id){
+  const st=DB.students.find(s=>s.id===id);
+  try{
+    await api('/api/students/'+id,{method:'DELETE'});
+    await loadData();
+    toast('Removed '+(st?st.name:'candidate'));
+  }catch(e){ toast(e.message,true); }
+}
+async function deleteRecruiter(r){
+  try{
+    await api('/api/recruiters/'+encodeURIComponent(r),{method:'DELETE'});
+    pendingDeleteRec=null;
+    await loadData();
+    toast('Removed recruiter '+r);
+  }catch(e){ toast(e.message,true); }
+}
+
+document.getElementById('recList').addEventListener('click',(e)=>{
+  const rcpt=e.target.closest('[data-rcpt]');
+  if(rcpt){ e.stopPropagation(); openReceipt(rcpt.getAttribute('data-rcpt')); return; }
+  const del=e.target.closest('[data-delid]');
+  if(del){ e.stopPropagation(); deleteCandidate(del.getAttribute('data-delid')); return; }
+  const yes=e.target.closest('[data-rdelyes]');
+  if(yes){ e.stopPropagation(); deleteRecruiter(yes.getAttribute('data-rdelyes')); return; }
+  const no=e.target.closest('[data-rdelno]');
+  if(no){ e.stopPropagation(); pendingDeleteRec=null; render(); return; }
+  const rdel=e.target.closest('[data-rdel]');
+  if(rdel){ e.stopPropagation(); pendingDeleteRec=rdel.getAttribute('data-rdel'); render(); return; }
+  const head=e.target.closest('.head');
+  if(head){ head.parentElement.classList.toggle('open'); }
+});
+
+// ---- Receipt generator (18% GST) ----
+async function openReceipt(id){
+  let r;
+  try{ r = await api('/api/receipt/'+id); }
+  catch(e){ toast(e.message,true); return; }
+  const dt = new Date(r.date);
+  const dateStr = dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  const statusHtml = r.pending>0
+    ? `<div class="rstatus due">Balance due: ${inr(r.pending)}</div>`
+    : `<div class="rstatus full">✓ Paid in full</div>`;
+  document.getElementById('rcptCard').innerHTML = `
+    <div class="rcptHead">
+      <div class="co">3DWEBSOFT FOUNDATION PVT LTD</div>
+      <div class="meta">
+        Door No.46-1, Near Saibaba, Muppa Road, Narsingi, Rangareddy District, Telangana - 500089<br>
+        CIN: U85499TS2026NPL220500 &nbsp;|&nbsp; GSTIN: 36AADCT2232B1ZT<br>
+        Ph: 9108534041 &nbsp;|&nbsp; info@3dwebsoftfoundation.org
+      </div>
+    </div>
+    <div class="rcptBody">
+      <div class="rcptTitle"><b>Fee Receipt</b><span>${r.receiptNo} · ${dateStr}</span></div>
+      <div class="rrow"><span class="lbl">Candidate</span><span>${r.candidate}</span></div>
+      <div class="rrow"><span class="lbl">Recruiter</span><span>${r.recruiter}</span></div>
+
+      <div class="rgroup">
+        <h4>Course fee breakup (incl. 18% GST)</h4>
+        <div class="rrow"><span class="lbl">Taxable value</span><span>${inr(r.taxableTotal)}</span></div>
+        <div class="rrow"><span class="lbl">CGST @ 9%</span><span>${inr(r.cgstTotal)}</span></div>
+        <div class="rrow"><span class="lbl">SGST @ 9%</span><span>${inr(r.sgstTotal)}</span></div>
+        <div class="rrow tot"><span>Total course fee</span><span>${inr(r.fee)}</span></div>
+      </div>
+
+      <div class="rgroup">
+        <h4>Payment received so far</h4>
+        <div class="rrow"><span class="lbl">Taxable value paid</span><span>${inr(r.taxablePaid)}</span></div>
+        <div class="rrow"><span class="lbl">CGST @ 9% paid</span><span>${inr(r.cgstPaid)}</span></div>
+        <div class="rrow"><span class="lbl">SGST @ 9% paid</span><span>${inr(r.sgstPaid)}</span></div>
+        <div class="rrow tot"><span>Total amount paid</span><span>${inr(r.paid)}</span></div>
+      </div>
+
+      ${statusHtml}
+    </div>
+    <div class="rbtns">
+      <button class="close" id="rcptClose">Close</button>
+      <button class="print" id="rcptPrint">🖨 Print / Save PDF</button>
+    </div>
+  `;
+  document.getElementById('rcptOverlay').classList.add('show');
+  document.getElementById('rcptClose').onclick=()=>document.getElementById('rcptOverlay').classList.remove('show');
+  document.getElementById('rcptPrint').onclick=()=>window.print();
+}
+document.getElementById('rcptOverlay').addEventListener('click',(e)=>{
+  if(e.target.id==='rcptOverlay') e.target.classList.remove('show');
+});
+
+updatePrev();
+loadData();
+</script>
+</body>
+</html>

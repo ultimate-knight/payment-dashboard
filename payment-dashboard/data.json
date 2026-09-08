@@ -1,0 +1,350 @@
+{
+  "students": [
+    {
+      "id": "s_b0",
+      "recruiter": "Abhinaya",
+      "name": "Gowthami",
+      "fee": 5000,
+      "paid": 2000,
+      "pending": 3000,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b1",
+      "recruiter": "Abhinaya",
+      "name": "Vineela",
+      "fee": 5000,
+      "paid": 5000,
+      "pending": 0,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b2",
+      "recruiter": "Abhinaya",
+      "name": "Ashish",
+      "fee": 5000,
+      "paid": 5000,
+      "pending": 0,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b3",
+      "recruiter": "Abhinaya",
+      "name": "Venkata Ramana",
+      "fee": 5000,
+      "paid": 5000,
+      "pending": 0,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b4",
+      "recruiter": "Abhinaya",
+      "name": "Jagadeesh",
+      "fee": 5000,
+      "paid": 5000,
+      "pending": 0,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b5",
+      "recruiter": "Abhinaya",
+      "name": "Sreekar",
+      "fee": 5000,
+      "paid": 5000,
+      "pending": 0,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b6",
+      "recruiter": "Pallavi",
+      "name": "G.praveen Kumar",
+      "fee": 5000,
+      "paid": 5000,
+      "pending": 0,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b7",
+      "recruiter": "Pallavi",
+      "name": "K.Naveen Kumar",
+      "fee": 5000,
+      "paid": 5000,
+      "pending": 0,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b8",
+      "recruiter": "Pallavi",
+      "name": "Bhargavi",
+      "fee": 5000,
+      "paid": 2500,
+      "pending": 2500,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b9",
+      "recruiter": "Renuka",
+      "name": "M.MOUNIKA",
+      "fee": 5000,
+      "paid": 5000,
+      "pending": 0,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b10",
+      "recruiter": "Renuka",
+      "name": "SHIVA KUMAR",
+      "fee": 5000,
+      "paid": 2000,
+      "pending": 3000,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b11",
+      "recruiter": "Renuka",
+      "name": "ARUN KUMAR",
+      "fee": 5000,
+      "paid": 2000,
+      "pending": 3000,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b12",
+      "recruiter": "Renuka",
+      "name": "VENKATESH",
+      "fee": 5000,
+      "paid": 3000,
+      "pending": 2000,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b13",
+      "recruiter": "Deepthi",
+      "name": "Abhinaya",
+      "fee": 5000,
+      "paid": 5000,
+      "pending": 0,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b14",
+      "recruiter": "Deepthi",
+      "name": "Pallavi",
+      "fee": 5000,
+      "paid": 5000,
+      "pending": 0,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b15",
+      "recruiter": "Deepthi",
+      "name": "Ayan Ali",
+      "fee": 5000,
+      "paid": 1000,
+      "pending": 4000,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b16",
+      "recruiter": "Deepthi",
+      "name": "Sowmya",
+      "fee": 5000,
+      "paid": 1000,
+      "pending": 4000,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b17",
+      "recruiter": "Deepthi",
+      "name": "Janamoni Jagan",
+      "fee": 5000,
+      "paid": 2500,
+      "pending": 2500,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b18",
+      "recruiter": "Deepthi",
+      "name": "Kranti",
+      "fee": 5000,
+      "paid": 5000,
+      "pending": 0,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b19",
+      "recruiter": "Deepthi",
+      "name": "Aishwarya",
+      "fee": 5000,
+      "paid": 1000,
+      "pending": 4000,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b20",
+      "recruiter": "Gnaneshwari",
+      "name": "Pavan",
+      "fee": 5000,
+      "paid": 5000,
+      "pending": 0,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b21",
+      "recruiter": "Gnaneshwari",
+      "name": "Chandrika",
+      "fee": 5000,
+      "paid": 5000,
+      "pending": 0,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b22",
+      "recruiter": "Gnaneshwari",
+      "name": "Ramya",
+      "fee": 5000,
+      "paid": 1000,
+      "pending": 4000,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b23",
+      "recruiter": "Fathima",
+      "name": "Ravi kiran",
+      "fee": 5000,
+      "paid": 2500,
+      "pending": 2500,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b24",
+      "recruiter": "Ameena",
+      "name": "Vinay",
+      "fee": 5000,
+      "paid": 1000,
+      "pending": 4000,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b25",
+      "recruiter": "Ameena",
+      "name": "Sonali Priya",
+      "fee": 5000,
+      "paid": 5000,
+      "pending": 0,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b26",
+      "recruiter": "Samiksha",
+      "name": "Risitha",
+      "fee": 5000,
+      "paid": 5000,
+      "pending": 0,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b27",
+      "recruiter": "Maaz",
+      "name": "Meghnath peruru",
+      "fee": 5000,
+      "paid": 5000,
+      "pending": 0,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b28",
+      "recruiter": "Maaz",
+      "name": "illa sudhakar",
+      "fee": 5000,
+      "paid": 5000,
+      "pending": 0,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b29",
+      "recruiter": "Maaz",
+      "name": "rewathi",
+      "fee": 5000,
+      "paid": 2500,
+      "pending": 2500,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b30",
+      "recruiter": "Jai Prakash",
+      "name": "Varsha",
+      "fee": 5000,
+      "paid": 2500,
+      "pending": 2500,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b31",
+      "recruiter": "Jai Prakash",
+      "name": "Malleshwari",
+      "fee": 5000,
+      "paid": 2000,
+      "pending": 3000,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b32",
+      "recruiter": "Jai Prakash",
+      "name": "Kiran",
+      "fee": 5000,
+      "paid": 5000,
+      "pending": 0,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b33",
+      "recruiter": "Jai Prakash",
+      "name": "Ramulamma",
+      "fee": 5000,
+      "paid": 2000,
+      "pending": 3000,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b34",
+      "recruiter": "Jai Prakash",
+      "name": "Akshitha",
+      "fee": 5000,
+      "paid": 1500,
+      "pending": 3500,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b35",
+      "recruiter": "Vishal",
+      "name": "Ramulu",
+      "fee": 5000,
+      "paid": 5000,
+      "pending": 0,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "s_b36",
+      "recruiter": "Vishal",
+      "name": "Sagar",
+      "fee": 5000,
+      "paid": 1000,
+      "pending": 4000,
+      "createdAt": "2026-09-01T00:00:00.000Z"
+    }
+  ],
+  "recruiters": [
+    "Abhinaya",
+    "Ameena",
+    "Deepthi",
+    "Fathima",
+    "Gnaneshwari",
+    "Jai Prakash",
+    "Maaz",
+    "Pallavi",
+    "Renuka",
+    "Samiksha",
+    "Vishal"
+  ]
+}

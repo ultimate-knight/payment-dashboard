@@ -1,0 +1,13 @@
+{
+  "name": "payment-status-dashboard",
+  "version": "1.0.0",
+  "description": "Payment status dashboard with a small Express backend so data persists across devices, plus a receipt generator with 18% GST.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  }
+}
