@@ -86,7 +86,9 @@ h1 span{color:var(--acc)}
 #rcptOverlay{position:fixed;inset:0;background:rgba(4,8,16,.72);display:none;align-items:flex-start;justify-content:center;padding:26px 14px;overflow-y:auto;z-index:100}
 #rcptOverlay.show{display:flex}
 .rcptCard{background:#fff;color:#14192b;width:100%;max-width:440px;border-radius:14px;overflow:hidden;font-family:'Inter',sans-serif}
-.rcptHead{background:#0b3d91;color:#fff;padding:18px 20px}
+.rcptHead{background:#0b3d91;color:#fff;padding:0}
+.rcptHead img{width:100%;display:block;max-height:150px;object-fit:cover;object-position:center 30%}
+.rcptHead .txt{padding:12px 20px 16px}
 .rcptHead .co{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px}
 .rcptHead .meta{font-size:10.5px;opacity:.85;margin-top:4px;line-height:1.6}
 .rcptBody{padding:18px 20px}
@@ -358,11 +360,14 @@ async function openReceipt(id){
     : `<div class="rstatus full">✓ Paid in full</div>`;
   document.getElementById('rcptCard').innerHTML = `
     <div class="rcptHead">
-      <div class="co">3DWEBSOFT FOUNDATION PVT LTD</div>
-      <div class="meta">
-        Door No.46-1, Near Saibaba, Muppa Road, Narsingi, Rangareddy District, Telangana - 500089<br>
-        CIN: U85499TS2026NPL220500 &nbsp;|&nbsp; GSTIN: 36AADCT2232B1ZT<br>
-        Ph: 9108534041 &nbsp;|&nbsp; info@3dwebsoftfoundation.org
+      <img src="/assets/logo.jpg" alt="3DWebSoft Foundation">
+      <div class="txt">
+        <div class="co">3DWEBSOFT FOUNDATION PVT LTD</div>
+        <div class="meta">
+          Door No.46-1, Near Saibaba, Muppa Road, Narsingi, Rangareddy District, Telangana - 500089<br>
+          CIN: U85499TS2026NPL220500 &nbsp;|&nbsp; GSTIN: 36AADCT2232B1ZT<br>
+          Ph: 9108534041 &nbsp;|&nbsp; info@3dwebsoftfoundation.org
+        </div>
       </div>
     </div>
     <div class="rcptBody">
