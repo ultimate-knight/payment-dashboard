@@ -8,26 +8,64 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const DB_FILE = path.join(__dirname, 'data.json');
+const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL;
+const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+const REDIS_KEY = 'payment_dashboard_db';
+const USE_REDIS = !!(REDIS_URL && REDIS_TOKEN);
 
-function loadDB() {
-  if (!fs.existsSync(DB_FILE)) {
-    fs.writeFileSync(DB_FILE, JSON.stringify({ students: [], recruiters: [] }, null, 2));
+const DB_FILE = path.join(__dirname, 'data.json');
+const EMPTY_DB = { students: [], recruiters: [] };
+
+async function redisCommand(pathSegments) {
+  const url = REDIS_URL + '/' + pathSegments.map(encodeURIComponent).join('/');
+  const res = await fetch(url, { headers: { Authorization: 'Bearer ' + REDIS_TOKEN } });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error('Upstash error (' + res.status + '): ' + text);
   }
+  const data = await res.json();
+  return data.result;
+}
+
+async function loadDB() {
+  if (USE_REDIS) {
+    const raw = await redisCommand(['get', REDIS_KEY]);
+    if (!raw) {
+      await redisCommand(['set', REDIS_KEY, JSON.stringify(EMPTY_DB)]);
+      return { ...EMPTY_DB };
+    }
+    try { return JSON.parse(raw); }
+    catch (e) { throw new Error('Stored data is corrupted: ' + e.message); }
+  }
+  if (!fs.existsSync(DB_FILE)) fs.writeFileSync(DB_FILE, JSON.stringify(EMPTY_DB, null, 2));
   return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
 }
-function saveDB(db) {
+
+async function saveDB(db) {
+  if (USE_REDIS) {
+    await redisCommand(['set', REDIS_KEY, JSON.stringify(db)]);
+    return;
+  }
   fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
 }
 
-// ---- Read everything (dashboard loads this on every device) ----
-app.get('/api/data', (req, res) => {
-  res.json(loadDB());
-});
+function handle(fn) {
+  return async (req, res) => {
+    try {
+      await fn(req, res);
+    } catch (e) {
+      console.error(e);
+      res.status(500).json({ error: e.message || 'Something went wrong on the server' });
+    }
+  };
+}
 
-// ---- Add a candidate ----
-app.post('/api/students', (req, res) => {
-  const db = loadDB();
+app.get('/api/data', handle(async (req, res) => {
+  res.json(await loadDB());
+}));
+
+app.post('/api/students', handle(async (req, res) => {
+  const db = await loadDB();
   const { recruiter, name, fee, paid } = req.body;
   if (!recruiter || !String(name || '').trim()) {
     return res.status(400).json({ error: 'recruiter and name are required' });
@@ -45,58 +83,52 @@ app.post('/api/students', (req, res) => {
   };
   db.students.push(student);
   if (!db.recruiters.includes(recruiter)) db.recruiters.push(recruiter);
-  saveDB(db);
+  await saveDB(db);
   res.json(student);
-});
+}));
 
-// ---- Record an additional payment against an existing candidate ----
-app.patch('/api/students/:id/payment', (req, res) => {
-  const db = loadDB();
+app.patch('/api/students/:id/payment', handle(async (req, res) => {
+  const db = await loadDB();
   const st = db.students.find(s => s.id === req.params.id);
   if (!st) return res.status(404).json({ error: 'candidate not found' });
   const addAmt = Number(req.body.amount) || 0;
   st.paid = Math.min(st.fee, Math.max(0, st.paid + addAmt));
   st.pending = st.fee - st.paid;
-  saveDB(db);
+  await saveDB(db);
   res.json(st);
-});
+}));
 
-// ---- Delete a candidate ----
-app.delete('/api/students/:id', (req, res) => {
-  const db = loadDB();
+app.delete('/api/students/:id', handle(async (req, res) => {
+  const db = await loadDB();
   db.students = db.students.filter(s => s.id !== req.params.id);
-  saveDB(db);
+  await saveDB(db);
   res.json({ ok: true });
-});
+}));
 
-// ---- Add an empty recruiter (no candidates yet) ----
-app.post('/api/recruiters', (req, res) => {
-  const db = loadDB();
+app.post('/api/recruiters', handle(async (req, res) => {
+  const db = await loadDB();
   const name = String(req.body.name || '').trim();
   if (!name) return res.status(400).json({ error: 'recruiter name required' });
   if (!db.recruiters.includes(name)) db.recruiters.push(name);
-  saveDB(db);
+  await saveDB(db);
   res.json({ ok: true });
-});
+}));
 
-// ---- Delete a recruiter (and all their candidates) ----
-app.delete('/api/recruiters/:name', (req, res) => {
-  const db = loadDB();
+app.delete('/api/recruiters/:name', handle(async (req, res) => {
+  const db = await loadDB();
   const name = decodeURIComponent(req.params.name);
   db.recruiters = db.recruiters.filter(r => r !== name);
   db.students = db.students.filter(s => s.recruiter !== name);
-  saveDB(db);
+  await saveDB(db);
   res.json({ ok: true });
-});
+}));
 
-// ---- Receipt data for one candidate (18% GST breakup) ----
-app.get('/api/receipt/:id', (req, res) => {
-  const db = loadDB();
+app.get('/api/receipt/:id', handle(async (req, res) => {
+  const db = await loadDB();
   const st = db.students.find(s => s.id === req.params.id);
   if (!st) return res.status(404).json({ error: 'candidate not found' });
 
   const GST_RATE = 0.18;
-  // st.fee / st.paid are treated as GST-inclusive amounts.
   const round2 = n => Math.round(n * 100) / 100;
   const taxableTotal = round2(st.fee / (1 + GST_RATE));
   const gstTotal = round2(st.fee - taxableTotal);
@@ -117,7 +149,17 @@ app.get('/api/receipt/:id', (req, res) => {
     taxablePaid, gstPaid,
     cgstPaid: round2(gstPaid / 2), sgstPaid: round2(gstPaid / 2)
   });
-});
+}));
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log('Payment dashboard server running on port ' + PORT));
+app.post('/api/seed-from-file', handle(async (req, res) => {
+  const seed = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+  await saveDB(seed);
+  res.json({ ok: true, students: seed.students.length, recruiters: seed.recruiters.length });
+}));
+
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => console.log('Payment dashboard server running on port ' + PORT + (USE_REDIS ? ' (Upstash Redis)' : ' (local data.json)')));
+}
+
+module.exports = app;
