@@ -86,11 +86,11 @@ h1 span{color:var(--acc)}
 #rcptOverlay{position:fixed;inset:0;background:rgba(4,8,16,.72);display:none;align-items:flex-start;justify-content:center;padding:26px 14px;overflow-y:auto;z-index:100}
 #rcptOverlay.show{display:flex}
 .rcptCard{background:#fff;color:#14192b;width:100%;max-width:440px;border-radius:14px;overflow:hidden;font-family:'Inter',sans-serif}
-.rcptHead{background:#0b3d91;color:#fff;padding:0}
-.rcptHead img{width:100%;display:block;max-height:150px;object-fit:cover;object-position:center 30%}
-.rcptHead .txt{padding:12px 20px 16px}
-.rcptHead .co{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px}
-.rcptHead .meta{font-size:10.5px;opacity:.85;margin-top:4px;line-height:1.6}
+.rcptHead{background:#fff;border-bottom:3px solid #0b3d91;padding:14px 18px;display:flex;align-items:center;gap:14px}
+.rcptHead img{width:64px;height:64px;object-fit:contain;flex-shrink:0;border-radius:8px}
+.rcptHead .txt{flex:1;min-width:0}
+.rcptHead .co{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14.5px;color:#0b3d91;line-height:1.25}
+.rcptHead .meta{font-size:9.5px;color:#6b7280;margin-top:3px;line-height:1.55}
 .rcptBody{padding:18px 20px}
 .rcptTitle{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
 .rcptTitle b{font-family:'Space Grotesk',sans-serif;font-size:15px}
