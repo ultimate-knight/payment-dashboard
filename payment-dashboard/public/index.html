@@ -19,6 +19,7 @@ h1 span{color:var(--acc)}
 .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 16px;position:relative;overflow:hidden}
 .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--full)}
 .kpi.r::before{background:var(--rem)}.kpi.p::before{background:var(--pend)}.kpi.a::before{background:var(--acc)}
+.kpi.jul::before{background:#60a5fa}.kpi.aug::before{background:#a78bfa}.kpi.sep::before{background:#34d399}
 .kpi .l{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
 .kpi .v{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;margin-top:5px;transition:color .3s}
 .kpi .v.flash{color:var(--acc)}
@@ -45,7 +46,7 @@ h1 span{color:var(--acc)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:14px}
 .card h3{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600}
 .card .cap{color:var(--mut);font-size:12px;margin:2px 0 14px}
-.box{position:relative;height:400px}.box.md{height:340px}
+.box{position:relative;height:400px}.box.md{height:340px}.box.sm{height:280px}
 .sec{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;margin:24px 2px 10px}
 .rec{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:10px;overflow:hidden}
 .rec .head{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer}
@@ -71,6 +72,8 @@ h1 span{color:var(--acc)}
 .stu .full{color:var(--full);font-weight:700;font-size:12px;min-width:56px;text-align:right}
 .stu .rcpt{background:var(--card2);border:1px solid var(--line);color:var(--acc);font-size:11.5px;font-weight:700;cursor:pointer;flex-shrink:0;padding:6px 10px;border-radius:8px}
 .stu .rcpt:hover{border-color:var(--acc)}
+.stu .pay{background:var(--card2);border:1px solid var(--line);color:var(--full);font-size:11.5px;font-weight:700;cursor:pointer;flex-shrink:0;padding:6px 10px;border-radius:8px}
+.stu .pay:hover{border-color:var(--full)}
 .stu .del{background:var(--card2);border:1px solid var(--line);color:var(--mut);font-size:16px;cursor:pointer;flex-shrink:0;line-height:1;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center}
 .stu .del:hover,.stu .del:active{color:#fff;background:var(--pend);border-color:var(--pend)}
 .none{padding:12px 16px;border-top:1px solid var(--line);color:var(--mut);font-size:13px}
@@ -86,9 +89,11 @@ h1 span{color:var(--acc)}
 #rcptOverlay{position:fixed;inset:0;background:rgba(4,8,16,.72);display:none;align-items:flex-start;justify-content:center;padding:26px 14px;overflow-y:auto;z-index:100}
 #rcptOverlay.show{display:flex}
 .rcptCard{background:#fff;color:#14192b;width:100%;max-width:440px;border-radius:14px;overflow:hidden;font-family:'Inter',sans-serif}
-.rcptHead{background:#0b3d91;color:#fff;display:flex;}
-.rcptHead .co{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px}
-.rcptHead .meta{font-size:10.5px;opacity:.85;margin-top:4px;line-height:1.6}
+.rcptHead{background:#fff;border-bottom:3px solid #0b3d91;padding:14px 18px;display:flex;align-items:center;gap:14px}
+.rcptHead img{width:64px;height:64px;object-fit:contain;flex-shrink:0;border-radius:8px}
+.rcptHead .txt{flex:1;min-width:0}
+.rcptHead .co{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14.5px;color:#0b3d91;line-height:1.25}
+.rcptHead .meta{font-size:9.5px;color:#6b7280;margin-top:3px;line-height:1.55}
 .rcptBody{padding:18px 20px}
 .rcptTitle{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
 .rcptTitle b{font-family:'Space Grotesk',sans-serif;font-size:15px}
@@ -113,6 +118,29 @@ h1 span{color:var(--acc)}
   .rcptCard{max-width:100%;border-radius:0}
 }
 @media(max-width:560px){.frow{grid-template-columns:1fr}.recman{flex-direction:column;align-items:stretch}}
+
+/* ---- Update payment modal ---- */
+#payOverlay{position:fixed;inset:0;background:rgba(4,8,16,.72);display:none;align-items:center;justify-content:center;padding:20px;z-index:100}
+#payOverlay.show{display:flex}
+.payCard{background:var(--card);border:1px solid var(--line);border-radius:16px;width:100%;max-width:380px;padding:20px}
+.payCard h3{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;margin-bottom:2px}
+.payCard .sub{color:var(--mut);font-size:12.5px;margin-bottom:16px}
+.payStats{display:flex;gap:10px;margin-bottom:16px}
+.payStats div{flex:1;background:var(--card2);border-radius:10px;padding:9px 10px}
+.payStats .l{font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px}
+.payStats .v{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14.5px;margin-top:2px}
+.payField label{display:block;font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:6px}
+.payField input{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:11px 12px;color:var(--ink);font-size:16px;font-family:inherit}
+.payField input:focus{outline:none;border-color:var(--full)}
+.payQuick{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.payQuick button{background:var(--card2);border:1px solid var(--line);color:var(--mut);font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:8px;cursor:pointer}
+.payQuick button:hover{border-color:var(--full);color:var(--full)}
+.payBtns{display:flex;gap:10px;margin-top:18px}
+.payBtns button{flex:1;border:none;border-radius:10px;padding:12px;font-size:13.5px;font-weight:700;font-family:inherit;cursor:pointer}
+.payBtns .cancel{background:var(--card2);color:var(--mut);border:1px solid var(--line)}
+.payBtns .save{background:var(--full);color:#04120a}
+
+.month-note{font-size:12px;color:var(--mut);margin:4px 0 14px;line-height:1.45}
 </style>
 </head>
 <body>
@@ -142,7 +170,35 @@ h1 span{color:var(--acc)}
     </div>
   </div>
 
+  <!-- Main live KPIs -->
   <div class="kpis" id="kpis"></div>
+
+  <!-- Dynamic Monthly Collection KPIs -->
+  <div class="kpis" id="monthKpis">
+    <div class="kpi jul">
+      <div class="l">July Collection</div>
+      <div class="v" id="mJul">₹0</div>
+      <div class="n" id="mJulN">0 students</div>
+    </div>
+    <div class="kpi aug">
+      <div class="l">August Collection</div>
+      <div class="v" id="mAug">₹0</div>
+      <div class="n" id="mAugN">0 students</div>
+    </div>
+    <div class="kpi sep">
+      <div class="l">September Collection</div>
+      <div class="v" id="mSep">₹0</div>
+      <div class="n" id="mSepN">0 students</div>
+    </div>
+    <div class="kpi a">
+      <div class="l">Jul + Aug + Sep</div>
+      <div class="v" id="mTotal">₹0</div>
+      <div class="n" id="mTotalN">dynamic total</div>
+    </div>
+  </div>
+  <div class="month-note" id="monthNote">
+    Monthly totals are calculated live from student dates (joined / created / doj). If a student has no date, they are excluded from the monthly charts.
+  </div>
 
   <div class="card">
     <h3>Full paid vs remaining — by recruiter</h3>
@@ -155,6 +211,18 @@ h1 span{color:var(--acc)}
     <div class="box md"><canvas id="pendChart"></canvas></div>
   </div>
 
+  <div class="card">
+    <h3>Monthly Collection — July / August / September</h3>
+    <div class="cap">Live calculation based on student date fields (paid amount)</div>
+    <div class="box sm"><canvas id="monthChart"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h3>Collection by Recruiter (live)</h3>
+    <div class="cap">Total amount paid under each recruiter — updates automatically</div>
+    <div class="box md"><canvas id="recColChart"></canvas></div>
+  </div>
+
   <div class="sec">Recruiters & candidates — tap to expand · 🧾 receipt · 🗑 to remove</div>
   <div id="recList"></div>
 
@@ -165,6 +233,11 @@ h1 span{color:var(--acc)}
 <!-- Receipt modal -->
 <div id="rcptOverlay">
   <div class="rcptCard" id="rcptCard"></div>
+</div>
+
+<!-- Update payment modal -->
+<div id="payOverlay">
+  <div class="payCard" id="payCard"></div>
 </div>
 
 <script>
@@ -208,6 +281,95 @@ const pendChart=new Chart(document.getElementById('pendChart'),{type:'bar',
   data:{labels:[],datasets:[{data:[],backgroundColor:[],borderRadius:4,barThickness:20}]},
   options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,animation:{duration:400},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+inr(c.raw)+' pending'}}},scales:{x:{grid:gx,ticks:{callback:v=>'₹'+v/1000+'k'}},y:{grid:gn}}}});
 
+const monthChart = new Chart(document.getElementById('monthChart'), {
+  type: 'bar',
+  data: {
+    labels: ['July 2026', 'August 2026', 'September 2026'],
+    datasets: [{
+      label: 'Collection (₹)',
+      data: [0, 0, 0],
+      backgroundColor: ['#60a5fa', '#a78bfa', '#34d399'],
+      borderRadius: 6,
+      barThickness: 42
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 500 },
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: c => ' ' + inr(c.raw) } }
+    },
+    scales: {
+      x: { grid: gn },
+      y: { grid: gx, ticks: { callback: v => '₹' + (v/1000) + 'k' } }
+    }
+  }
+});
+
+const recColChart = new Chart(document.getElementById('recColChart'), {
+  type: 'bar',
+  data: {
+    labels: [],
+    datasets: [{
+      label: 'Total Collected (₹)',
+      data: [],
+      backgroundColor: [],
+      borderRadius: 5,
+      barThickness: 18
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 500 },
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: c => ' ' + inr(c.raw) } }
+    },
+    scales: {
+      x: { grid: gx, ticks: { callback: v => '₹' + (v/1000) + 'k' } },
+      y: { grid: gn }
+    }
+  }
+});
+
+/* ---------- Dynamic monthly calculation from live data ---------- */
+function parseStudentDate(s) {
+  // Try common field names that backends usually store
+  const candidates = [
+    s.doj, s.date, s.joined, s.joinedAt, s.joined_at,
+    s.createdAt, s.created_at, s.paymentDate, s.payment_date,
+    s.dateOfJoining, s.date_of_joining
+  ];
+  for (const val of candidates) {
+    if (val == null || val === '') continue;
+    const d = new Date(val);
+    if (!isNaN(d.getTime())) return d;
+  }
+  return null;
+}
+
+function computeMonthly() {
+  const months = { 7: { total: 0, count: 0 }, 8: { total: 0, count: 0 }, 9: { total: 0, count: 0 } };
+  let withDate = 0, withoutDate = 0;
+
+  allStudents().forEach(s => {
+    const d = parseStudentDate(s);
+    if (!d) { withoutDate++; return; }
+    withDate++;
+    const m = d.getMonth() + 1; // 1-12
+    if (months[m]) {
+      months[m].total += Number(s.paid) || 0;
+      months[m].count += 1;
+    }
+  });
+
+  return { months, withDate, withoutDate };
+}
+
 function aggregate(){
   const map={};
   activeRecruiters().forEach(r=>map[r]={recruiter:r,total:0,full:0,remaining:0,pending_amt:0,collected:0,remaining_list:[],full_list:[]});
@@ -232,6 +394,41 @@ function render(justAdded){
     <div class="kpi p"><div class="l">Total pending</div><div class="v" id="kP">${inr(totP)}</div><div class="n">to collect</div></div>
     <div class="kpi a"><div class="l">Collected</div><div class="v" id="kC">${inr(totC)}</div><div class="n">${R.length} recruiters</div></div>`;
   if(justAdded){ ['kF','kR','kP','kC'].forEach(id=>flash(document.getElementById(id))); }
+
+  // ---- Dynamic monthly KPIs + chart ----
+  const { months, withDate, withoutDate } = computeMonthly();
+  const jul = months[7], aug = months[8], sep = months[9];
+  const sum3 = jul.total + aug.total + sep.total;
+
+  document.getElementById('mJul').textContent = inr(jul.total);
+  document.getElementById('mJulN').textContent = jul.count + ' student' + (jul.count !== 1 ? 's' : '');
+  document.getElementById('mAug').textContent = inr(aug.total);
+  document.getElementById('mAugN').textContent = aug.count + ' student' + (aug.count !== 1 ? 's' : '');
+  document.getElementById('mSep').textContent = inr(sep.total);
+  document.getElementById('mSepN').textContent = sep.count + ' student' + (sep.count !== 1 ? 's' : '');
+  document.getElementById('mTotal').textContent = inr(sum3);
+  document.getElementById('mTotalN').textContent = (jul.count + aug.count + sep.count) + ' students in Jul–Sep';
+
+  const noteEl = document.getElementById('monthNote');
+  if (withDate === 0) {
+    noteEl.innerHTML = '⚠️ No student date fields found yet. Monthly totals will appear automatically once students have a date (doj / joined / createdAt / etc.). Backend is not changed.';
+  } else {
+    noteEl.innerHTML = `Live calculation from ${withDate} student(s) that have a date field.` +
+      (withoutDate > 0 ? ` ${withoutDate} student(s) without a date are excluded from monthly charts.` : '');
+  }
+
+  monthChart.data.datasets[0].data = [jul.total, aug.total, sep.total];
+  monthChart.update();
+
+  // ---- Live Collection by Recruiter chart ----
+  const sortedByCollected = [...R].sort((a,b) => b.collected - a.collected);
+  const colors = ['#3dd68c','#6b8cff','#a78bfa','#f472b6','#60a5fa','#34d399','#fbbf24','#fb923c','#f87171','#c084fc','#94a3b8','#38bdf8','#e879f9'];
+  recColChart.data.labels = sortedByCollected.map(r => r.recruiter);
+  recColChart.data.datasets[0].data = sortedByCollected.map(r => r.collected);
+  recColChart.data.datasets[0].backgroundColor = sortedByCollected.map((_,i) => colors[i % colors.length]);
+  recColChart.update();
+
+  // Existing charts
   splitChart.data.labels=R.map(r=>r.recruiter);
   splitChart.data.datasets[0].data=R.map(r=>r.full);
   splitChart.data.datasets[1].data=R.map(r=>r.remaining);
@@ -241,13 +438,14 @@ function render(justAdded){
   pendChart.data.datasets[0].data=P.map(r=>r.pending_amt);
   pendChart.data.datasets[0].backgroundColor=P.map(r=>r.pending_amt>=8000?'#ff5d73':r.pending_amt>=4000?'#ff9f5a':'#ffc94d');
   pendChart.update();
+
   const openSet=new Set([...document.querySelectorAll('.rec.open')].map(e=>e.dataset.r));
   document.getElementById('recList').innerHTML = R.map(r=>{
     const pct=r.total?Math.round(r.full/r.total*100):0;
     const rows=r.remaining_list.sort((a,b)=>b.pending-a.pending).map(st=>
-      `<div class="stu"><span class="snm">${st.name}</span><span class="paid">₹${st.paid.toLocaleString('en-IN')} paid</span><span class="owe">₹${st.pending.toLocaleString('en-IN')}</span><button class="rcpt" data-rcpt="${st.id}">🧾 Receipt</button><button class="del" data-delid="${st.id}" title="Delete candidate">×</button></div>`).join('');
+      `<div class="stu"><span class="snm">${st.name}</span><span class="paid">₹${st.paid.toLocaleString('en-IN')} paid</span><span class="owe">₹${st.pending.toLocaleString('en-IN')}</span><button class="pay" data-pay="${st.id}">✏️ Update</button><button class="rcpt" data-rcpt="${st.id}">🧾 Receipt</button><button class="del" data-delid="${st.id}" title="Delete candidate">×</button></div>`).join('');
     const fulls=r.full_list.map(st=>
-      `<div class="stu"><span class="snm">${st.name}</span><span class="paid">₹${st.paid.toLocaleString('en-IN')} paid</span><span class="full">✓ full</span><button class="rcpt" data-rcpt="${st.id}">🧾 Receipt</button><button class="del" data-delid="${st.id}" title="Delete candidate">×</button></div>`).join('');
+      `<div class="stu"><span class="snm">${st.name}</span><span class="paid">₹${st.paid.toLocaleString('en-IN')} paid</span><span class="full">✓ full</span><button class="pay" data-pay="${st.id}">✏️ Update</button><button class="rcpt" data-rcpt="${st.id}">🧾 Receipt</button><button class="del" data-delid="${st.id}" title="Delete candidate">×</button></div>`).join('');
     const body=(rows+fulls)||`<div class="none">No candidates yet — add one above</div>`;
     let head;
     if(pendingDeleteRec===r.recruiter){
@@ -332,6 +530,8 @@ async function deleteRecruiter(r){
 }
 
 document.getElementById('recList').addEventListener('click',(e)=>{
+  const pay=e.target.closest('[data-pay]');
+  if(pay){ e.stopPropagation(); openPayModal(pay.getAttribute('data-pay')); return; }
   const rcpt=e.target.closest('[data-rcpt]');
   if(rcpt){ e.stopPropagation(); openReceipt(rcpt.getAttribute('data-rcpt')); return; }
   const del=e.target.closest('[data-delid]');
@@ -346,6 +546,55 @@ document.getElementById('recList').addEventListener('click',(e)=>{
   if(head){ head.parentElement.classList.toggle('open'); }
 });
 
+// ---- Update payment (record a new payment against a candidate) ----
+function openPayModal(id){
+  const st=DB.students.find(s=>s.id===id);
+  if(!st){ toast('Candidate not found',true); return; }
+  document.getElementById('payCard').innerHTML=`
+    <h3>Update payment</h3>
+    <div class="sub">${st.name} · ${st.recruiter}</div>
+    <div class="payStats">
+      <div><div class="l">Fee</div><div class="v">${inr(st.fee)}</div></div>
+      <div><div class="l">Paid</div><div class="v" style="color:var(--full)">${inr(st.paid)}</div></div>
+      <div><div class="l">Pending</div><div class="v" style="color:var(--pend)">${inr(st.pending)}</div></div>
+    </div>
+    <div class="payField">
+      <label>Amount received now (₹)</label>
+      <input type="number" id="payAmt" placeholder="e.g. 2000" inputmode="numeric" autofocus>
+      <div class="payQuick">
+        ${st.pending>0?`<button type="button" data-quick="${st.pending}">Clear full due (${inr(st.pending)})</button>`:''}
+        <button type="button" data-quick="1000">+₹1,000</button>
+        <button type="button" data-quick="2500">+₹2,500</button>
+        <button type="button" data-quick="5000">+₹5,000</button>
+      </div>
+    </div>
+    <div class="payBtns">
+      <button class="cancel" id="payCancel">Cancel</button>
+      <button class="save" id="paySave">Save payment</button>
+    </div>
+  `;
+  document.getElementById('payOverlay').classList.add('show');
+  const amtInput=document.getElementById('payAmt');
+  document.getElementById('payCard').querySelectorAll('[data-quick]').forEach(b=>{
+    b.onclick=()=>{ amtInput.value=b.getAttribute('data-quick'); amtInput.focus(); };
+  });
+  document.getElementById('payCancel').onclick=()=>document.getElementById('payOverlay').classList.remove('show');
+  document.getElementById('paySave').onclick=async ()=>{
+    const amt=+amtInput.value;
+    if(!amt || amt<=0){ toast('Enter an amount greater than 0',true); return; }
+    try{
+      await api('/api/students/'+id+'/payment',{method:'PATCH',body:JSON.stringify({amount:amt})});
+      document.getElementById('payOverlay').classList.remove('show');
+      await loadData();
+      render(true);
+      toast('Payment updated for '+st.name);
+    }catch(e){ toast(e.message,true); }
+  };
+}
+document.getElementById('payOverlay').addEventListener('click',(e)=>{
+  if(e.target.id==='payOverlay') e.target.classList.remove('show');
+});
+
 // ---- Receipt generator (18% GST) ----
 async function openReceipt(id){
   let r;
@@ -358,11 +607,14 @@ async function openReceipt(id){
     : `<div class="rstatus full">✓ Paid in full</div>`;
   document.getElementById('rcptCard').innerHTML = `
     <div class="rcptHead">
-      <div class="co">3DWEBSOFT FOUNDATION PVT LTD</div>
-      <div class="meta">
-        Door No.46-1, Near Saibaba, Muppa Road, Narsingi, Rangareddy District, Telangana - 500089<br>
-        CIN: U85499TS2026NPL220500 &nbsp;|&nbsp; GSTIN: 36AADCT2232B1ZT<br>
-        Ph: 9108534041 &nbsp;|&nbsp; info@3dwebsoftfoundation.org
+      <img src="/assets/logo.jpg" alt="3DWebSoft Foundation">
+      <div class="txt">
+        <div class="co">3DWEBSOFT FOUNDATION PVT LTD</div>
+        <div class="meta">
+          Door No.46-1, Near Saibaba, Muppa Road, Narsingi, Rangareddy District, Telangana - 500089<br>
+          CIN: U85499TS2026NPL220500 &nbsp;|&nbsp; GSTIN: 36AADCT2232B1ZT<br>
+          Ph: 9108534041 &nbsp;|&nbsp; info@3dwebsoftfoundation.org
+        </div>
       </div>
     </div>
     <div class="rcptBody">
