@@ -4,3262 +4,489 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Payment Status Dashboard — Live</title>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
-
 <style>
-:root{
-  --bg:#0c111d;
-  --card:#151c2d;
-  --card2:#1c2540;
-  --line:#28324c;
-  --ink:#eaf0ff;
-  --mut:#8592b5;
-  --full:#3dd68c;
-  --rem:#ff9f5a;
-  --pend:#ff5d73;
-  --acc:#6b8cff;
-}
-
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  -webkit-tap-highlight-color:transparent
-}
-
-body{
-  background:var(--bg);
-  color:var(--ink);
-  font-family:'Inter',system-ui,sans-serif;
-  padding:20px 16px 50px
-}
-
-.wrap{
-  max-width:860px;
-  margin:0 auto
-}
-
-h1{
-  font-family:'Space Grotesk',sans-serif;
-  font-size:24px;
-  font-weight:700;
-  letter-spacing:-.4px
-}
-
-h1 span{
-  color:var(--acc)
-}
-
-.sub{
-  color:var(--mut);
-  font-size:13px;
-  margin:3px 0 18px
-}
-
-.kpis{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-  gap:12px;
-  margin-bottom:16px
-}
-
-.kpi{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:15px 16px;
-  position:relative;
-  overflow:hidden
-}
-
-.kpi::before{
-  content:"";
-  position:absolute;
-  left:0;
-  top:0;
-  bottom:0;
-  width:4px;
-  background:var(--full)
-}
-
-.kpi.r::before{
-  background:var(--rem)
-}
-
-.kpi.p::before{
-  background:var(--pend)
-}
-
-.kpi.a::before{
-  background:var(--acc)
-}
-
-.kpi .l{
-  font-size:11px;
-  color:var(--mut);
-  text-transform:uppercase;
-  letter-spacing:.5px;
-  font-weight:600
-}
-
-.kpi .v{
-  font-family:'Space Grotesk',sans-serif;
-  font-size:26px;
-  font-weight:700;
-  margin-top:5px;
-  transition:color .3s
-}
-
-.kpi .v.flash{
-  color:var(--acc)
-}
-
-.kpi .n{
-  font-size:11.5px;
-  color:var(--mut);
-  margin-top:2px
-}
-
-.addbar{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:16px 18px;
-  margin-bottom:16px
-}
-
-.addbar h3{
-  font-family:'Space Grotesk',sans-serif;
-  font-size:15px;
-  font-weight:600;
-  margin-bottom:3px
-}
-
-.addbar .cap{
-  color:var(--mut);
-  font-size:12px;
-  margin-bottom:14px
-}
-
-.frow{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-bottom:10px
-}
-
-.field label{
-  display:block;
-  font-size:11px;
-  color:var(--mut);
-  text-transform:uppercase;
-  letter-spacing:.5px;
-  font-weight:600;
-  margin-bottom:5px
-}
-
-.field input,
-.field select{
-  width:100%;
-  background:var(--card2);
-  border:1px solid var(--line);
-  border-radius:10px;
-  padding:11px 12px;
-  color:var(--ink);
-  font-size:15px;
-  font-family:inherit
-}
-
-.field input:focus,
-.field select:focus{
-  outline:none;
-  border-color:var(--acc)
-}
-
-.pendprev{
-  font-size:12.5px;
-  color:var(--mut);
-  margin-bottom:12px
-}
-
-.pendprev b{
-  font-family:'Space Grotesk',sans-serif
-}
-
-.pendprev .due{
-  color:var(--rem)
-}
-
-.pendprev .clr{
-  color:var(--full)
-}
-
-.addbtn{
-  width:100%;
-  background:var(--acc);
-  color:#06101f;
-  border:none;
-  border-radius:11px;
-  padding:13px;
-  font-size:15px;
-  font-weight:700;
-  font-family:inherit;
-  cursor:pointer
-}
-
-.addbtn:active{
-  transform:scale(.99)
-}
-
-.addbtn:disabled{
-  opacity:.6
-}
-
-.newrec{
-  display:none;
-  margin-top:2px;
-  margin-bottom:10px
-}
-
-.newrec.show{
-  display:block
-}
-
-.recman{
-  margin-top:14px;
-  padding-top:14px;
-  border-top:1px solid var(--line);
-  display:flex;
-  gap:10px;
-  align-items:flex-end
-}
-
-.recman .field{
-  flex:1
-}
-
-.mbtn{
-  background:var(--card2);
-  color:var(--ink);
-  border:1px solid var(--line);
-  border-radius:10px;
-  padding:11px 16px;
-  font-size:14px;
-  font-weight:600;
-  font-family:inherit;
-  cursor:pointer;
-  white-space:nowrap
-}
-
-.mbtn:active{
-  transform:scale(.98)
-}
-
-.card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:16px 18px;
-  margin-bottom:14px
-}
-
-.card h3{
-  font-family:'Space Grotesk',sans-serif;
-  font-size:15px;
-  font-weight:600
-}
-
-.card .cap{
-  color:var(--mut);
-  font-size:12px;
-  margin:2px 0 14px
-}
-
-.box{
-  position:relative;
-  height:400px
-}
-
-.box.md{
-  height:340px
-}
-
-.sec{
-  font-family:'Space Grotesk',sans-serif;
-  font-size:14px;
-  font-weight:600;
-  margin:24px 2px 10px
-}
-
-.rec{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:14px;
-  margin-bottom:10px;
-  overflow:hidden
-}
-
-.rec .head{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:14px 16px;
-  cursor:pointer
-}
-
-.rec .nm{
-  font-weight:700;
-  font-size:15px;
-  flex:1
-}
-
-.rec .stat{
-  font-size:12px;
-  color:var(--mut)
-}
-
-.rec .amt{
-  font-family:'Space Grotesk',sans-serif;
-  font-weight:700;
-  color:var(--pend);
-  font-size:15px
-}
-
-.rec .rdel{
-  background:none;
-  border:none;
-  color:var(--mut);
-  font-size:15px;
-  cursor:pointer;
-  padding:2px 4px
-}
-
-.rec .rdel:hover{
-  color:var(--pend)
-}
-
-.rec .chev{
-  color:var(--mut);
-  transition:.2s;
-  font-size:13px
-}
-
-.rec.open .chev{
-  transform:rotate(90deg)
-}
-
-.cfm{
-  border:none;
-  border-radius:8px;
-  padding:5px 11px;
-  font-size:12px;
-  font-weight:700;
-  font-family:inherit;
-  cursor:pointer
-}
-
-.cfm.yes{
-  background:var(--pend);
-  color:#fff
-}
-
-.cfm.no{
-  background:var(--card2);
-  color:var(--mut);
-  border:1px solid var(--line)
-}
-
-.warn{
-  font-size:12px;
-  color:var(--pend);
-  flex:1
-}
-
-.mini{
-  height:6px;
-  border-radius:6px;
-  background:var(--card2);
-  overflow:hidden;
-  width:56px;
-  flex-shrink:0
-}
-
-.mini i{
-  display:block;
-  height:100%;
-  background:var(--full)
-}
-
-.body{
-  max-height:0;
-  overflow:hidden;
-  transition:max-height .35s ease
-}
-
-.rec.open .body{
-  max-height:2000px
-}
-
-.stu{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  padding:10px 16px;
-  border-top:1px solid var(--line);
-  font-size:13.5px;
-  flex-wrap:wrap
-}
-
-.stu .snm{
-  flex:1;
-  min-width:90px
-}
-
-.stu .snm .tag{
-  font-size:9.5px;
-  background:rgba(107,140,255,.18);
-  color:var(--acc);
-  padding:1px 6px;
-  border-radius:10px;
-  margin-left:6px;
-  vertical-align:middle
-}
-
-.stu .paid{
-  color:var(--full);
-  font-variant-numeric:tabular-nums;
-  font-size:12.5px
-}
-
-.stu .owe{
-  color:var(--pend);
-  font-weight:700;
-  font-variant-numeric:tabular-nums;
-  min-width:56px;
-  text-align:right
-}
-
-.stu .full{
-  color:var(--full);
-  font-weight:700;
-  font-size:12px;
-  min-width:56px;
-  text-align:right
-}
-
-.stu .rcpt{
-  background:var(--card2);
-  border:1px solid var(--line);
-  color:var(--acc);
-  font-size:11.5px;
-  font-weight:700;
-  cursor:pointer;
-  flex-shrink:0;
-  padding:6px 10px;
-  border-radius:8px
-}
-
-.stu .rcpt:hover{
-  border-color:var(--acc)
-}
-
-.stu .pay{
-  background:var(--card2);
-  border:1px solid var(--line);
-  color:var(--full);
-  font-size:11.5px;
-  font-weight:700;
-  cursor:pointer;
-  flex-shrink:0;
-  padding:6px 10px;
-  border-radius:8px
-}
-
-.stu .pay:hover{
-  border-color:var(--full)
-}
-
-.stu .del{
-  background:var(--card2);
-  border:1px solid var(--line);
-  color:var(--mut);
-  font-size:16px;
-  cursor:pointer;
-  flex-shrink:0;
-  line-height:1;
-  width:34px;
-  height:34px;
-  border-radius:9px;
-  display:flex;
-  align-items:center;
-  justify-content:center
-}
-
-.stu .del:hover,
-.stu .del:active{
-  color:#fff;
-  background:var(--pend);
-  border-color:var(--pend)
-}
-
-.none{
-  padding:12px 16px;
-  border-top:1px solid var(--line);
-  color:var(--mut);
-  font-size:13px
-}
-
-.foot{
-  text-align:center;
-  color:var(--mut);
-  font-size:11px;
-  margin-top:22px;
-  line-height:1.8
-}
-
-#toast{
-  position:fixed;
-  left:50%;
-  bottom:26px;
-  transform:translateX(-50%) translateY(20px);
-  background:var(--full);
-  color:#04120a;
-  font-weight:700;
-  font-size:14px;
-  padding:11px 18px;
-  border-radius:12px;
-  opacity:0;
-  pointer-events:none;
-  transition:.25s;
-  z-index:50
-}
-
-#toast.show{
-  opacity:1;
-  transform:translateX(-50%) translateY(0)
-}
-
-#toast.err{
-  background:var(--pend);
-  color:#fff
-}
-
-.connbar{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  font-size:11.5px;
-  color:var(--mut);
-  margin-bottom:12px
-}
-
-.dot{
-  width:8px;
-  height:8px;
-  border-radius:50%;
-  background:var(--full)
-}
-
-.dot.off{
-  background:var(--pend)
-}
-
-/* Receipt modal */
-
-#rcptOverlay{
-  position:fixed;
-  inset:0;
-  background:rgba(4,8,16,.72);
-  display:none;
-  align-items:flex-start;
-  justify-content:center;
-  padding:26px 14px;
-  overflow-y:auto;
-  z-index:100
-}
-
-#rcptOverlay.show{
-  display:flex
-}
-
-.rcptCard{
-  background:#fff;
-  color:#14192b;
-  width:100%;
-  max-width:440px;
-  border-radius:14px;
-  overflow:hidden;
-  font-family:'Inter',sans-serif
-}
-
-.rcptHead{
-  background:#fff;
-  border-bottom:3px solid #0b3d91;
-  padding:14px 18px;
-  display:flex;
-  align-items:center;
-  gap:14px
-}
-
-.rcptHead img{
-  width:64px;
-  height:64px;
-  object-fit:contain;
-  flex-shrink:0;
-  border-radius:8px
-}
-
-.rcptHead .txt{
-  flex:1;
-  min-width:0
-}
-
-.rcptHead .co{
-  font-family:'Space Grotesk',sans-serif;
-  font-weight:700;
-  font-size:14.5px;
-  color:#0b3d91;
-  line-height:1.25
-}
-
-.rcptHead .meta{
-  font-size:9.5px;
-  color:#6b7280;
-  margin-top:3px;
-  line-height:1.55
-}
-
-.rcptBody{
-  padding:18px 20px
-}
-
-.rcptTitle{
-  display:flex;
-  justify-content:space-between;
-  align-items:baseline;
-  margin-bottom:14px
-}
-
-.rcptTitle b{
-  font-family:'Space Grotesk',sans-serif;
-  font-size:15px
-}
-
-.rcptTitle span{
-  font-size:11px;
-  color:#6b7280
-}
-
-.rrow{
-  display:flex;
-  justify-content:space-between;
-  font-size:13px;
-  padding:6px 0;
-  border-bottom:1px dashed #e5e7eb
-}
-
-.rrow.tot{
-  border-bottom:none;
-  border-top:2px solid #14192b;
-  margin-top:6px;
-  padding-top:10px;
-  font-weight:700;
-  font-size:14.5px
-}
-
-.rrow .lbl{
-  color:#6b7280
-}
-
-.rgroup{
-  margin:14px 0
-}
-
-.rgroup h4{
-  font-size:10.5px;
-  text-transform:uppercase;
-  letter-spacing:.5px;
-  color:#6b7280;
-  margin-bottom:4px
-}
-
-.rstatus{
-  margin-top:14px;
-  padding:10px 12px;
-  border-radius:10px;
-  font-size:12.5px;
-  font-weight:700;
-  text-align:center
-}
-
-.rstatus.full{
-  background:#e7f9ef;
-  color:#1a9c58
-}
-
-.rstatus.due{
-  background:#fff1ec;
-  color:#d6491f
-}
-
-.rbtns{
-  display:flex;
-  gap:10px;
-  padding:0 20px 20px
-}
-
-.rbtns button{
-  flex:1;
-  border:none;
-  border-radius:10px;
-  padding:12px;
-  font-size:13.5px;
-  font-weight:700;
-  font-family:inherit;
-  cursor:pointer
-}
-
-.rbtns .close{
-  background:#eef0f5;
-  color:#333
-}
-
-.rbtns .print{
-  background:#0b3d91;
-  color:#fff
-}
-
+:root{--bg:#0c111d;--card:#151c2d;--card2:#1c2540;--line:#28324c;--ink:#eaf0ff;--mut:#8592b5;
+  --full:#3dd68c;--rem:#ff9f5a;--pend:#ff5d73;--acc:#6b8cff;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;padding:20px 16px 50px}
+.wrap{max-width:860px;margin:0 auto}
+h1{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;letter-spacing:-.4px}
+h1 span{color:var(--acc)}
+.sub{color:var(--mut);font-size:13px;margin:3px 0 18px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 16px;position:relative;overflow:hidden}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--full)}
+.kpi.r::before{background:var(--rem)}.kpi.p::before{background:var(--pend)}.kpi.a::before{background:var(--acc)}
+.kpi .l{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.kpi .v{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;margin-top:5px;transition:color .3s}
+.kpi .v.flash{color:var(--acc)}
+.kpi .n{font-size:11.5px;color:var(--mut);margin-top:2px}
+.addbar{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:16px}
+.addbar h3{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;margin-bottom:3px}
+.addbar .cap{color:var(--mut);font-size:12px;margin-bottom:14px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.field label{display:block;font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:5px}
+.field input,.field select{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:11px 12px;color:var(--ink);font-size:15px;font-family:inherit}
+.field input:focus,.field select:focus{outline:none;border-color:var(--acc)}
+.pendprev{font-size:12.5px;color:var(--mut);margin-bottom:12px}
+.pendprev b{font-family:'Space Grotesk',sans-serif}
+.pendprev .due{color:var(--rem)}.pendprev .clr{color:var(--full)}
+.addbtn{width:100%;background:var(--acc);color:#06101f;border:none;border-radius:11px;padding:13px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer}
+.addbtn:active{transform:scale(.99)}
+.addbtn:disabled{opacity:.6}
+.newrec{display:none;margin-top:2px;margin-bottom:10px}
+.newrec.show{display:block}
+.recman{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);display:flex;gap:10px;align-items:flex-end}
+.recman .field{flex:1}
+.mbtn{background:var(--card2);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:11px 16px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap}
+.mbtn:active{transform:scale(.98)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:14px}
+.card h3{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600}
+.card .cap{color:var(--mut);font-size:12px;margin:2px 0 14px}
+.box{position:relative;height:400px}.box.md{height:340px}
+.sec{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;margin:24px 2px 10px}
+.rec{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:10px;overflow:hidden}
+.rec .head{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer}
+.rec .nm{font-weight:700;font-size:15px;flex:1}
+.rec .stat{font-size:12px;color:var(--mut)}
+.rec .amt{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--pend);font-size:15px}
+.rec .rdel{background:none;border:none;color:var(--mut);font-size:15px;cursor:pointer;padding:2px 4px}
+.rec .rdel:hover{color:var(--pend)}
+.rec .chev{color:var(--mut);transition:.2s;font-size:13px}
+.rec.open .chev{transform:rotate(90deg)}
+.cfm{border:none;border-radius:8px;padding:5px 11px;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer}
+.cfm.yes{background:var(--pend);color:#fff}.cfm.no{background:var(--card2);color:var(--mut);border:1px solid var(--line)}
+.warn{font-size:12px;color:var(--pend);flex:1}
+.mini{height:6px;border-radius:6px;background:var(--card2);overflow:hidden;width:56px;flex-shrink:0}
+.mini i{display:block;height:100%;background:var(--full)}
+.body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.rec.open .body{max-height:2000px}
+.stu{display:flex;align-items:center;gap:8px;padding:10px 16px;border-top:1px solid var(--line);font-size:13.5px;flex-wrap:wrap}
+.stu .snm{flex:1;min-width:90px}
+.stu .snm .tag{font-size:9.5px;background:rgba(107,140,255,.18);color:var(--acc);padding:1px 6px;border-radius:10px;margin-left:6px;vertical-align:middle}
+.stu .paid{color:var(--full);font-variant-numeric:tabular-nums;font-size:12.5px}
+.stu .owe{color:var(--pend);font-weight:700;font-variant-numeric:tabular-nums;min-width:56px;text-align:right}
+.stu .full{color:var(--full);font-weight:700;font-size:12px;min-width:56px;text-align:right}
+.stu .rcpt{background:var(--card2);border:1px solid var(--line);color:var(--acc);font-size:11.5px;font-weight:700;cursor:pointer;flex-shrink:0;padding:6px 10px;border-radius:8px}
+.stu .rcpt:hover{border-color:var(--acc)}
+.stu .pay{background:var(--card2);border:1px solid var(--line);color:var(--full);font-size:11.5px;font-weight:700;cursor:pointer;flex-shrink:0;padding:6px 10px;border-radius:8px}
+.stu .pay:hover{border-color:var(--full)}
+.stu .del{background:var(--card2);border:1px solid var(--line);color:var(--mut);font-size:16px;cursor:pointer;flex-shrink:0;line-height:1;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center}
+.stu .del:hover,.stu .del:active{color:#fff;background:var(--pend);border-color:var(--pend)}
+.none{padding:12px 16px;border-top:1px solid var(--line);color:var(--mut);font-size:13px}
+.foot{text-align:center;color:var(--mut);font-size:11px;margin-top:22px;line-height:1.8}
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--full);color:#04120a;font-weight:700;font-size:14px;padding:11px 18px;border-radius:12px;opacity:0;pointer-events:none;transition:.25s;z-index:50}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.err{background:var(--pend);color:#fff}
+.connbar{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--mut);margin-bottom:12px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--full)}
+.dot.off{background:var(--pend)}
+
+/* ---- Receipt modal ---- */
+#rcptOverlay{position:fixed;inset:0;background:rgba(4,8,16,.72);display:none;align-items:flex-start;justify-content:center;padding:26px 14px;overflow-y:auto;z-index:100}
+#rcptOverlay.show{display:flex}
+.rcptCard{background:#fff;color:#14192b;width:100%;max-width:440px;border-radius:14px;overflow:hidden;font-family:'Inter',sans-serif}
+.rcptHead{background:#fff;border-bottom:3px solid #0b3d91;padding:14px 18px;display:flex;align-items:center;gap:14px}
+.rcptHead img{width:64px;height:64px;object-fit:contain;flex-shrink:0;border-radius:8px}
+.rcptHead .txt{flex:1;min-width:0}
+.rcptHead .co{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14.5px;color:#0b3d91;line-height:1.25}
+.rcptHead .meta{font-size:9.5px;color:#6b7280;margin-top:3px;line-height:1.55}
+.rcptBody{padding:18px 20px}
+.rcptTitle{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+.rcptTitle b{font-family:'Space Grotesk',sans-serif;font-size:15px}
+.rcptTitle span{font-size:11px;color:#6b7280}
+.rrow{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px dashed #e5e7eb}
+.rrow.tot{border-bottom:none;border-top:2px solid #14192b;margin-top:6px;padding-top:10px;font-weight:700;font-size:14.5px}
+.rrow .lbl{color:#6b7280}
+.rgroup{margin:14px 0}
+.rgroup h4{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;margin-bottom:4px}
+.rstatus{margin-top:14px;padding:10px 12px;border-radius:10px;font-size:12.5px;font-weight:700;text-align:center}
+.rstatus.full{background:#e7f9ef;color:#1a9c58}
+.rstatus.due{background:#fff1ec;color:#d6491f}
+.rbtns{display:flex;gap:10px;padding:0 20px 20px}
+.rbtns button{flex:1;border:none;border-radius:10px;padding:12px;font-size:13.5px;font-weight:700;font-family:inherit;cursor:pointer}
+.rbtns .close{background:#eef0f5;color:#333}
+.rbtns .print{background:#0b3d91;color:#fff}
 @media print{
-  body *{
-    visibility:hidden
-  }
-
-  #rcptOverlay,
-  #rcptOverlay *{
-    visibility:visible
-  }
-
-  #rcptOverlay{
-    position:absolute;
-    inset:auto;
-    top:0;
-    left:0;
-    background:#fff;
-    padding:0
-  }
-
-  .rbtns{
-    display:none
-  }
-
-  .rcptCard{
-    max-width:100%;
-    border-radius:0
-  }
+  body *{visibility:hidden}
+  #rcptOverlay,#rcptOverlay *{visibility:visible}
+  #rcptOverlay{position:absolute;inset:auto;top:0;left:0;background:#fff;padding:0}
+  .rbtns{display:none}
+  .rcptCard{max-width:100%;border-radius:0}
 }
+@media(max-width:560px){.frow{grid-template-columns:1fr}.recman{flex-direction:column;align-items:stretch}}
 
-/* Update payment modal */
-
-#payOverlay{
-  position:fixed;
-  inset:0;
-  background:rgba(4,8,16,.72);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-  z-index:100
-}
-
-#payOverlay.show{
-  display:flex
-}
-
-.payCard{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:16px;
-  width:100%;
-  max-width:380px;
-  padding:20px
-}
-
-.payCard h3{
-  font-family:'Space Grotesk',sans-serif;
-  font-size:16px;
-  font-weight:700;
-  margin-bottom:2px
-}
-
-.payCard .sub{
-  color:var(--mut);
-  font-size:12.5px;
-  margin-bottom:16px
-}
-
-.payStats{
-  display:flex;
-  gap:10px;
-  margin-bottom:16px
-}
-
-.payStats div{
-  flex:1;
-  background:var(--card2);
-  border-radius:10px;
-  padding:9px 10px
-}
-
-.payStats .l{
-  font-size:10px;
-  color:var(--mut);
-  text-transform:uppercase;
-  letter-spacing:.4px
-}
-
-.payStats .v{
-  font-family:'Space Grotesk',sans-serif;
-  font-weight:700;
-  font-size:14.5px;
-  margin-top:2px
-}
-
-.payField label{
-  display:block;
-  font-size:11px;
-  color:var(--mut);
-  text-transform:uppercase;
-  letter-spacing:.5px;
-  font-weight:600;
-  margin-bottom:6px
-}
-
-.payField input{
-  width:100%;
-  background:var(--card2);
-  border:1px solid var(--line);
-  border-radius:10px;
-  padding:11px 12px;
-  color:var(--ink);
-  font-size:16px;
-  font-family:inherit
-}
-
-.payField input:focus{
-  outline:none;
-  border-color:var(--full)
-}
-
-.payQuick{
-  display:flex;
-  gap:6px;
-  margin-top:8px;
-  flex-wrap:wrap
-}
-
-.payQuick button{
-  background:var(--card2);
-  border:1px solid var(--line);
-  color:var(--mut);
-  font-size:11.5px;
-  font-weight:600;
-  padding:5px 10px;
-  border-radius:8px;
-  cursor:pointer
-}
-
-.payQuick button:hover{
-  border-color:var(--full);
-  color:var(--full)
-}
-
-.payBtns{
-  display:flex;
-  gap:10px;
-  margin-top:18px
-}
-
-.payBtns button{
-  flex:1;
-  border:none;
-  border-radius:10px;
-  padding:12px;
-  font-size:13.5px;
-  font-weight:700;
-  font-family:inherit;
-  cursor:pointer
-}
-
-.payBtns .cancel{
-  background:var(--card2);
-  color:var(--mut);
-  border:1px solid var(--line)
-}
-
-.payBtns .save{
-  background:var(--full);
-  color:#04120a
-}
-
-@media(max-width:560px){
-  .frow{
-    grid-template-columns:1fr
-  }
-
-  .recman{
-    flex-direction:column;
-    align-items:stretch
-  }
-}
+/* ---- Update payment modal ---- */
+#payOverlay{position:fixed;inset:0;background:rgba(4,8,16,.72);display:none;align-items:center;justify-content:center;padding:20px;z-index:100}
+#payOverlay.show{display:flex}
+.payCard{background:var(--card);border:1px solid var(--line);border-radius:16px;width:100%;max-width:380px;padding:20px}
+.payCard h3{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;margin-bottom:2px}
+.payCard .sub{color:var(--mut);font-size:12.5px;margin-bottom:16px}
+.payStats{display:flex;gap:10px;margin-bottom:16px}
+.payStats div{flex:1;background:var(--card2);border-radius:10px;padding:9px 10px}
+.payStats .l{font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px}
+.payStats .v{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14.5px;margin-top:2px}
+.payField label{display:block;font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:6px}
+.payField input{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:11px 12px;color:var(--ink);font-size:16px;font-family:inherit}
+.payField input:focus{outline:none;border-color:var(--full)}
+.payQuick{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.payQuick button{background:var(--card2);border:1px solid var(--line);color:var(--mut);font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:8px;cursor:pointer}
+.payQuick button:hover{border-color:var(--full);color:var(--full)}
+.payBtns{display:flex;gap:10px;margin-top:18px}
+.payBtns button{flex:1;border:none;border-radius:10px;padding:12px;font-size:13.5px;font-weight:700;font-family:inherit;cursor:pointer}
+.payBtns .cancel{background:var(--card2);color:var(--mut);border:1px solid var(--line)}
+.payBtns .save{background:var(--full);color:#04120a}
 </style>
 </head>
-
 <body>
-
 <div class="wrap">
-
   <h1>Payment <span>Status</span> — Live</h1>
+  <div class="sub">Add & remove candidates and recruiters — data is saved on the server, so it's the same on every device · fee ₹5,000/student</div>
+  <div class="connbar"><span class="dot" id="connDot"></span><span id="connText">Connecting to server…</span></div>
 
-  <div class="sub">
-    Add & remove candidates and recruiters — data is saved on the server, so it's the same on every device · fee ₹5,000/student
-  </div>
-
-  <div class="connbar">
-    <span class="dot" id="connDot"></span>
-    <span id="connText">Connecting to server…</span>
-  </div>
-
-  <!-- ADD CANDIDATE -->
   <div class="addbar">
-
     <h3>➕ Add a candidate</h3>
-
-    <div class="cap">
-      Pick recruiter, enter student & amount paid. Pending auto-calculates.
-    </div>
-
+    <div class="cap">Pick recruiter, enter student & amount paid. Pending auto-calculates.</div>
     <div class="frow">
-
-      <div class="field">
-        <label>Recruiter</label>
-        <select id="fRec"></select>
-      </div>
-
-      <div class="field">
-        <label>Candidate name</label>
-        <input id="fName" placeholder="e.g. Rahul K" autocomplete="off">
-      </div>
-
+      <div class="field"><label>Recruiter</label><select id="fRec"></select></div>
+      <div class="field"><label>Candidate name</label><input id="fName" placeholder="e.g. Rahul K" autocomplete="off"></div>
     </div>
-
-    <div class="field newrec" id="newRecWrap">
-      <label>New recruiter name</label>
-      <input id="fNewRec" placeholder="Type new recruiter" autocomplete="off">
-    </div>
-
+    <div class="field newrec" id="newRecWrap"><label>New recruiter name</label><input id="fNewRec" placeholder="Type new recruiter" autocomplete="off"></div>
     <div class="frow">
-
-      <div class="field">
-        <label>Course fee (₹, incl. 18% GST)</label>
-        <input id="fFee" type="number" value="5000" inputmode="numeric">
-      </div>
-
-      <div class="field">
-        <label>Amount paid (₹)</label>
-        <input id="fPaid" type="number" placeholder="0" inputmode="numeric">
-      </div>
-
+      <div class="field"><label>Course fee (₹, incl. 18% GST)</label><input id="fFee" type="number" value="5000" inputmode="numeric"></div>
+      <div class="field"><label>Amount paid (₹)</label><input id="fPaid" type="number" placeholder="0" inputmode="numeric"></div>
     </div>
-
-    <div class="pendprev" id="pendPrev">
-      Pending: <b class="due">₹5,000</b>
-    </div>
-
-    <button class="addbtn" id="addBtn">
-      Add candidate & update dashboard
-    </button>
+    <div class="pendprev" id="pendPrev">Pending: <b class="due">₹5,000</b></div>
+    <button class="addbtn" id="addBtn">Add candidate & update dashboard</button>
 
     <div class="recman">
-
-      <div class="field">
-        <label>Add an empty recruiter (no candidates yet)</label>
-        <input id="fAddRec" placeholder="New recruiter name" autocomplete="off">
-      </div>
-
-      <button class="mbtn" id="addRecBtn">
-        + Add recruiter
-      </button>
-
+      <div class="field"><label>Add an empty recruiter (no candidates yet)</label><input id="fAddRec" placeholder="New recruiter name" autocomplete="off"></div>
+      <button class="mbtn" id="addRecBtn">+ Add recruiter</button>
     </div>
-
   </div>
 
-  <!-- KPI CARDS -->
   <div class="kpis" id="kpis"></div>
 
-  <!-- STUDENT COUNT CHART -->
   <div class="card">
-
     <h3>Full paid vs remaining — by recruiter</h3>
-
-    <div class="cap">
-      Green = cleared · Orange = still owe. Updates live.
-    </div>
-
-    <div class="box">
-      <canvas id="splitChart"></canvas>
-    </div>
-
+    <div class="cap">Green = cleared · Orange = still owe. Updates live.</div>
+    <div class="box"><canvas id="splitChart"></canvas></div>
   </div>
-
-  <!-- PENDING CHART -->
   <div class="card">
-
     <h3>Pending amount to collect — by recruiter</h3>
-
-    <div class="cap">
-      ₹ still to recover from each recruiter's students
-    </div>
-
-    <div class="box md">
-      <canvas id="pendChart"></canvas>
-    </div>
-
+    <div class="cap">₹ still to recover from each recruiter's students</div>
+    <div class="box md"><canvas id="pendChart"></canvas></div>
   </div>
 
-  <!-- NEW COLLECTED CHART -->
-  <div class="card">
-
-    <h3>Collected amount — by recruiter</h3>
-
-    <div class="cap">
-      ₹ already collected from each recruiter's students
-    </div>
-
-    <div class="box md">
-      <canvas id="collectedChart"></canvas>
-    </div>
-
-  </div>
-
-  <!-- RECRUITERS -->
-  <div class="sec">
-    Recruiters & candidates — tap to expand · 🧾 receipt · 🗑 to remove
-  </div>
-
+  <div class="sec">Recruiters & candidates — tap to expand · 🧾 receipt · 🗑 to remove</div>
   <div id="recList"></div>
 
   <div class="foot" id="foot"></div>
-
 </div>
-
 <div id="toast"></div>
 
-<!-- RECEIPT MODAL -->
-
+<!-- Receipt modal -->
 <div id="rcptOverlay">
-
   <div class="rcptCard" id="rcptCard"></div>
-
 </div>
 
-<!-- PAYMENT MODAL -->
-
+<!-- Update payment modal -->
 <div id="payOverlay">
-
   <div class="payCard" id="payCard"></div>
-
 </div>
-
 
 <script>
-
-const API = '';
-
-const inr = v =>
-  '₹' + Number(v).toLocaleString('en-IN',{
-    maximumFractionDigits:2
-  });
-
+const API = ''; // same origin — set to e.g. 'https://your-app.onrender.com' if the frontend is hosted separately
+const inr = v => '₹' + Number(v).toLocaleString('en-IN', {maximumFractionDigits:2});
 const FEE_DEFAULT = 5000;
 
-let DB = {
-  students: [],
-  recruiters: []
-};
-
+let DB = { students: [], recruiters: [] };
 let pendingDeleteRec = null;
 
-
-/* =========================
-   API
-========================= */
-
-async function api(path, opts){
-
-  const res = await fetch(
-    API + path,
-    Object.assign(
-      {
-        headers:{
-          'Content-Type':'application/json'
-        }
-      },
-      opts
-    )
-  );
-
-  if(!res.ok){
-
-    const e =
-      await res.json()
-      .catch(()=>({error:'Request failed'}));
-
-    throw new Error(
-      e.error || 'Request failed'
-    );
-  }
-
+async function api(path, opts) {
+  const res = await fetch(API + path, Object.assign({ headers: { 'Content-Type': 'application/json' } }, opts));
+  if (!res.ok) { const e = await res.json().catch(()=>({error:'Request failed'})); throw new Error(e.error || 'Request failed'); }
   return res.json();
 }
 
-
-/* =========================
-   LOAD DATA
-========================= */
-
-async function loadData(){
-
-  try{
-
+async function loadData() {
+  try {
     DB = await api('/api/data');
-
     setConn(true);
-
     fillRecs();
-
     render();
-
-  }catch(e){
-
+  } catch (e) {
     setConn(false);
-
   }
-
 }
-
-
 function setConn(ok){
-
-  document
-    .getElementById('connDot')
-    .classList
-    .toggle('off',!ok);
-
-  document
-    .getElementById('connText')
-    .textContent =
-      ok
-      ? 'Connected — data synced across all devices'
-      : 'Can\'t reach the server — start it with "npm start"';
-
+  document.getElementById('connDot').classList.toggle('off', !ok);
+  document.getElementById('connText').textContent = ok ? 'Connected — data synced across all devices' : 'Can\'t reach the server — start it with "npm start"';
 }
 
-
-/* =========================
-   DATA HELPERS
-========================= */
-
-function allStudents(){
-
-  return DB.students;
-
-}
-
-
-function activeRecruiters(){
-
-  return [...DB.recruiters].sort();
-
-}
-
-
-/* =========================
-   CHART DEFAULTS
-========================= */
-
-Chart.defaults.color = '#8592b5';
-
-Chart.defaults.font.family = 'Inter';
-
-Chart.defaults.font.size = 11;
-
-const gx = {
-  color:'rgba(40,50,76,.6)'
-};
-
-const gn = {
-  display:false
-};
-
-
-/* =========================
-   CHART 1
-   FULL VS REMAINING
-========================= */
-
-const splitChart =
-new Chart(
-  document.getElementById('splitChart'),
-  {
-    type:'bar',
-
-    data:{
-      labels:[],
-
-      datasets:[
-
-        {
-          label:'Paid full',
-          data:[],
-          backgroundColor:'#3dd68c',
-          borderRadius:4,
-          barThickness:18
-        },
-
-        {
-          label:'Remaining',
-          data:[],
-          backgroundColor:'#ff9f5a',
-          borderRadius:4,
-          barThickness:18
-        }
-
-      ]
-    },
-
-    options:{
-
-      indexAxis:'y',
-
-      responsive:true,
-
-      maintainAspectRatio:false,
-
-      animation:{
-        duration:400
-      },
-
-      plugins:{
-
-        legend:{
-          position:'top',
-          labels:{
-            boxWidth:12,
-            padding:12
-          }
-        },
-
-        tooltip:{
-          callbacks:{
-            label:c =>
-              ' ' +
-              c.dataset.label +
-              ': ' +
-              c.raw +
-              ' students'
-          }
-        }
-
-      },
-
-      scales:{
-
-        x:{
-          stacked:true,
-          grid:gx,
-          ticks:{
-            stepSize:1
-          }
-        },
-
-        y:{
-          stacked:true,
-          grid:gn
-        }
-
-      }
-
-    }
-
-  }
-);
-
-
-/* =========================
-   CHART 2
-   PENDING AMOUNT
-========================= */
-
-const pendChart =
-new Chart(
-  document.getElementById('pendChart'),
-  {
-    type:'bar',
-
-    data:{
-      labels:[],
-
-      datasets:[
-
-        {
-          data:[],
-          backgroundColor:[],
-          borderRadius:4,
-          barThickness:20
-        }
-
-      ]
-    },
-
-    options:{
-
-      indexAxis:'y',
-
-      responsive:true,
-
-      maintainAspectRatio:false,
-
-      animation:{
-        duration:400
-      },
-
-      plugins:{
-
-        legend:{
-          display:false
-        },
-
-        tooltip:{
-          callbacks:{
-            label:c =>
-              ' ' +
-              inr(c.raw) +
-              ' pending'
-          }
-        }
-
-      },
-
-      scales:{
-
-        x:{
-          grid:gx,
-
-          ticks:{
-            callback:v =>
-              '₹' +
-              v/1000 +
-              'k'
-          }
-        },
-
-        y:{
-          grid:gn
-        }
-
-      }
-
-    }
-
-  }
-);
-
-
-/* =========================
-   CHART 3
-   COLLECTED AMOUNT
-   NEW FRONTEND ONLY
-========================= */
-
-const collectedChart =
-new Chart(
-  document.getElementById('collectedChart'),
-  {
-    type:'bar',
-
-    data:{
-      labels:[],
-
-      datasets:[
-
-        {
-          data:[],
-
-          backgroundColor:'#3dd68c',
-
-          borderRadius:4,
-
-          barThickness:20
-        }
-
-      ]
-    },
-
-    options:{
-
-      indexAxis:'y',
-
-      responsive:true,
-
-      maintainAspectRatio:false,
-
-      animation:{
-        duration:400
-      },
-
-      plugins:{
-
-        legend:{
-          display:false
-        },
-
-        tooltip:{
-          callbacks:{
-            label:c =>
-              ' ' +
-              inr(c.raw) +
-              ' collected'
-          }
-        }
-
-      },
-
-      scales:{
-
-        x:{
-          grid:gx,
-
-          ticks:{
-            callback:v =>
-              '₹' +
-              v/1000 +
-              'k'
-          }
-        },
-
-        y:{
-          grid:gn
-        }
-
-      }
-
-    }
-
-  }
-);
-
-
-/* =========================
-   AGGREGATE
-========================= */
+function allStudents(){ return DB.students; }
+function activeRecruiters(){ return [...DB.recruiters].sort(); }
+
+Chart.defaults.color='#8592b5'; Chart.defaults.font.family='Inter'; Chart.defaults.font.size=11;
+const gx={color:'rgba(40,50,76,.6)'}, gn={display:false};
+const splitChart=new Chart(document.getElementById('splitChart'),{type:'bar',
+  data:{labels:[],datasets:[{label:'Paid full',data:[],backgroundColor:'#3dd68c',borderRadius:4,barThickness:18},{label:'Remaining',data:[],backgroundColor:'#ff9f5a',borderRadius:4,barThickness:18}]},
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,animation:{duration:400},plugins:{legend:{position:'top',labels:{boxWidth:12,padding:12}},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+c.raw+' students'}}},scales:{x:{stacked:true,grid:gx,ticks:{stepSize:1}},y:{stacked:true,grid:gn}}}});
+const pendChart=new Chart(document.getElementById('pendChart'),{type:'bar',
+  data:{labels:[],datasets:[{data:[],backgroundColor:[],borderRadius:4,barThickness:20}]},
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,animation:{duration:400},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+inr(c.raw)+' pending'}}},scales:{x:{grid:gx,ticks:{callback:v=>'₹'+v/1000+'k'}},y:{grid:gn}}}});
 
 function aggregate(){
-
-  const map = {};
-
-  activeRecruiters().forEach(r => {
-
-    map[r] = {
-
-      recruiter:r,
-
-      total:0,
-
-      full:0,
-
-      remaining:0,
-
-      pending_amt:0,
-
-      collected:0,
-
-      remaining_list:[],
-
-      full_list:[]
-
-    };
-
+  const map={};
+  activeRecruiters().forEach(r=>map[r]={recruiter:r,total:0,full:0,remaining:0,pending_amt:0,collected:0,remaining_list:[],full_list:[]});
+  allStudents().forEach(s=>{
+    if(!map[s.recruiter]) map[s.recruiter]={recruiter:s.recruiter,total:0,full:0,remaining:0,pending_amt:0,collected:0,remaining_list:[],full_list:[]};
+    const m=map[s.recruiter]; m.total++; m.collected+=s.paid;
+    if(s.pending>0){ m.remaining++; m.pending_amt+=s.pending; m.remaining_list.push(s); }
+    else { m.full++; m.full_list.push(s); }
   });
-
-
-  allStudents().forEach(s => {
-
-    if(!map[s.recruiter]){
-
-      map[s.recruiter] = {
-
-        recruiter:s.recruiter,
-
-        total:0,
-
-        full:0,
-
-        remaining:0,
-
-        pending_amt:0,
-
-        collected:0,
-
-        remaining_list:[],
-
-        full_list:[]
-
-      };
-
-    }
-
-
-    const m = map[s.recruiter];
-
-    m.total++;
-
-    /*
-      EXISTING DATA
-
-      This is already coming from
-      your backend student object.
-    */
-
-    m.collected += s.paid;
-
-
-    if(s.pending > 0){
-
-      m.remaining++;
-
-      m.pending_amt += s.pending;
-
-      m.remaining_list.push(s);
-
-    }else{
-
-      m.full++;
-
-      m.full_list.push(s);
-
-    }
-
-  });
-
-
-  return Object.values(map).sort(
-    (a,b) =>
-      b.remaining-a.remaining ||
-      b.pending_amt-a.pending_amt ||
-      b.collected-a.collected ||
-      a.recruiter.localeCompare(b.recruiter)
-  );
-
+  return Object.values(map).sort((a,b)=>b.remaining-a.remaining||b.pending_amt-a.pending_amt||b.collected-a.collected||a.recruiter.localeCompare(b.recruiter));
 }
-
-
-function flash(el){
-
-  if(el){
-
-    el.classList.add('flash');
-
-    setTimeout(
-      ()=>el.classList.remove('flash'),
-      450
-    );
-
-  }
-
-}
-
-
-/* =========================
-   RENDER
-========================= */
+function flash(el){ if(el){el.classList.add('flash'); setTimeout(()=>el.classList.remove('flash'),450);} }
 
 function render(justAdded){
-
-  const R = aggregate();
-
-
-  const totF =
-    R.reduce(
-      (s,r)=>s+r.full,
-      0
-    );
-
-
-  const totR =
-    R.reduce(
-      (s,r)=>s+r.remaining,
-      0
-    );
-
-
-  const totP =
-    R.reduce(
-      (s,r)=>s+r.pending_amt,
-      0
-    );
-
-
-  const totC =
-    R.reduce(
-      (s,r)=>s+r.collected,
-      0
-    );
-
-
-  const totS =
-    totF + totR;
-
-
-  /* =========================
-     KPI CARDS
-  ========================= */
-
-  document.getElementById('kpis').innerHTML =
-
-   `<div class="kpi">
-
-      <div class="l">
-        Paid in full
-      </div>
-
-      <div class="v" id="kF">
-        ${totF}
-      </div>
-
-      <div class="n">
-        of ${totS} students
-      </div>
-
-    </div>
-
-
-    <div class="kpi r">
-
-      <div class="l">
-        Have to pay
-      </div>
-
-      <div class="v" id="kR">
-        ${totR}
-      </div>
-
-      <div class="n">
-        still owe balance
-      </div>
-
-    </div>
-
-
-    <div class="kpi p">
-
-      <div class="l">
-        Total pending
-      </div>
-
-      <div class="v" id="kP">
-        ${inr(totP)}
-      </div>
-
-      <div class="n">
-        to collect
-      </div>
-
-    </div>
-
-
-    <div class="kpi a">
-
-      <div class="l">
-        Collected
-      </div>
-
-      <div class="v" id="kC">
-        ${inr(totC)}
-      </div>
-
-      <div class="n">
-        ${R.length} recruiters
-      </div>
-
-    </div>`;
-
-
-  if(justAdded){
-
-    [
-      'kF',
-      'kR',
-      'kP',
-      'kC'
-    ].forEach(id =>
-      flash(
-        document.getElementById(id)
-      )
-    );
-
-  }
-
-
-  /* =========================
-     CHART 1
-     FULL VS REMAINING
-  ========================= */
-
-  splitChart.data.labels =
-    R.map(r=>r.recruiter);
-
-  splitChart.data.datasets[0].data =
-    R.map(r=>r.full);
-
-  splitChart.data.datasets[1].data =
-    R.map(r=>r.remaining);
-
+  const R=aggregate();
+  const totF=R.reduce((s,r)=>s+r.full,0), totR=R.reduce((s,r)=>s+r.remaining,0);
+  const totP=R.reduce((s,r)=>s+r.pending_amt,0), totC=R.reduce((s,r)=>s+r.collected,0);
+  const totS=totF+totR;
+  document.getElementById('kpis').innerHTML=
+   `<div class="kpi"><div class="l">Paid in full</div><div class="v" id="kF">${totF}</div><div class="n">of ${totS} students</div></div>
+    <div class="kpi r"><div class="l">Have to pay</div><div class="v" id="kR">${totR}</div><div class="n">still owe balance</div></div>
+    <div class="kpi p"><div class="l">Total pending</div><div class="v" id="kP">${inr(totP)}</div><div class="n">to collect</div></div>
+    <div class="kpi a"><div class="l">Collected</div><div class="v" id="kC">${inr(totC)}</div><div class="n">${R.length} recruiters</div></div>`;
+  if(justAdded){ ['kF','kR','kP','kC'].forEach(id=>flash(document.getElementById(id))); }
+  splitChart.data.labels=R.map(r=>r.recruiter);
+  splitChart.data.datasets[0].data=R.map(r=>r.full);
+  splitChart.data.datasets[1].data=R.map(r=>r.remaining);
   splitChart.update();
-
-
-  /* =========================
-     CHART 2
-     PENDING
-  ========================= */
-
-  const P =
-    R.filter(
-      r=>r.pending_amt>0
-    );
-
-
-  pendChart.data.labels =
-    P.map(r=>r.recruiter);
-
-
-  pendChart.data.datasets[0].data =
-    P.map(r=>r.pending_amt);
-
-
-  pendChart.data.datasets[0].backgroundColor =
-    P.map(
-      r =>
-        r.pending_amt >= 8000
-          ? '#ff5d73'
-          : r.pending_amt >= 4000
-            ? '#ff9f5a'
-            : '#ffc94d'
-    );
-
-
+  const P=R.filter(r=>r.pending_amt>0);
+  pendChart.data.labels=P.map(r=>r.recruiter);
+  pendChart.data.datasets[0].data=P.map(r=>r.pending_amt);
+  pendChart.data.datasets[0].backgroundColor=P.map(r=>r.pending_amt>=8000?'#ff5d73':r.pending_amt>=4000?'#ff9f5a':'#ffc94d');
   pendChart.update();
-
-
-  /* =========================
-     CHART 3
-     COLLECTED
-  ========================= */
-
-  const C =
-    R.filter(
-      r=>r.collected>0
-    );
-
-
-  collectedChart.data.labels =
-    C.map(
-      r=>r.recruiter
-    );
-
-
-  collectedChart.data.datasets[0].data =
-    C.map(
-      r=>r.collected
-    );
-
-
-  collectedChart.update();
-
-
-  /* =========================
-     RECRUITER LIST
-  ========================= */
-
-  const openSet =
-    new Set(
-      [
-        ...document
-          .querySelectorAll('.rec.open')
-      ].map(
-        e=>e.dataset.r
-      )
-    );
-
-
-  document.getElementById('recList').innerHTML =
-
-    R.map(r=>{
-
-      const pct =
-        r.total
-          ? Math.round(
-              r.full/r.total*100
-            )
-          : 0;
-
-
-      const rows =
-        r.remaining_list
-          .sort(
-            (a,b)=>
-              b.pending-a.pending
-          )
-          .map(
-            st=>
-
-              `<div class="stu">
-
-                <span class="snm">
-                  ${st.name}
-                </span>
-
-                <span class="paid">
-                  ₹${st.paid.toLocaleString('en-IN')} paid
-                </span>
-
-                <span class="owe">
-                  ₹${st.pending.toLocaleString('en-IN')}
-                </span>
-
-                <button
-                  class="pay"
-                  data-pay="${st.id}">
-                  ✏️ Update
-                </button>
-
-                <button
-                  class="rcpt"
-                  data-rcpt="${st.id}">
-                  🧾 Receipt
-                </button>
-
-                <button
-                  class="del"
-                  data-delid="${st.id}"
-                  title="Delete candidate">
-                  ×
-                </button>
-
-              </div>`
-          )
-          .join('');
-
-
-      const fulls =
-        r.full_list
-          .map(
-            st=>
-
-              `<div class="stu">
-
-                <span class="snm">
-                  ${st.name}
-                </span>
-
-                <span class="paid">
-                  ₹${st.paid.toLocaleString('en-IN')} paid
-                </span>
-
-                <span class="full">
-                  ✓ full
-                </span>
-
-                <button
-                  class="pay"
-                  data-pay="${st.id}">
-                  ✏️ Update
-                </button>
-
-                <button
-                  class="rcpt"
-                  data-rcpt="${st.id}">
-                  🧾 Receipt
-                </button>
-
-                <button
-                  class="del"
-                  data-delid="${st.id}"
-                  title="Delete candidate">
-                  ×
-                </button>
-
-              </div>`
-          )
-          .join('');
-
-
-      const body =
-        (rows+fulls) ||
-        `<div class="none">
-          No candidates yet — add one above
-        </div>`;
-
-
-      let head;
-
-
-      if(
-        pendingDeleteRec ===
-        r.recruiter
-      ){
-
-        head =
-
-          `<span class="warn">
-            Delete “${r.recruiter}”
-            ${
-              r.total
-                ? ` and ${r.total} candidate(s)`
-                : ''
-            }?
-          </span>
-
-          <button
-            class="cfm yes"
-            data-rdelyes="${r.recruiter}">
-            Delete
-          </button>
-
-          <button
-            class="cfm no"
-            data-rdelno="1">
-            Cancel
-          </button>`;
-
-      }else{
-
-        head =
-
-          `<div class="mini">
-            <i style="width:${pct}%"></i>
-          </div>
-
-          <div class="nm">
-            ${r.recruiter}
-          </div>
-
-          <div class="stat">
-            ${r.full}/${r.total} full ·
-            <b style="color:var(--rem)">
-              ${r.remaining} owe
-            </b>
-          </div>
-
-          <div class="amt">
-            ${
-              r.pending_amt>0
-                ? inr(r.pending_amt)
-                : '—'
-            }
-          </div>
-
-          <button
-            class="rdel"
-            data-rdel="${r.recruiter}"
-            title="Remove recruiter">
-            🗑
-          </button>
-
-          <div class="chev">
-            ▶
-          </div>`;
-
-      }
-
-
-      return
-
-        `<div
-          class="rec ${
-            openSet.has(r.recruiter)
-              ? 'open'
-              : ''
-          }"
-          data-r="${r.recruiter}">
-
-          <div class="head">
-            ${head}
-          </div>
-
-          <div class="body">
-            ${body}
-          </div>
-
-        </div>`;
-
-    })
-    .join('');
-
-
-  /* =========================
-     FOOTER
-  ========================= */
-
-  document.getElementById('foot').innerHTML =
-
-    `${inr(totP)} outstanding ·
-     ${totR} owe ·
-     ${totS} students ·
-     ${R.length} recruiters
-     <br>
-     Live — synced to the server,
-     visible from any device.`;
-
-}
-
-
-/* =========================
-   RECRUITER SELECT
-========================= */
-
-const fRec =
-  document.getElementById('fRec');
-
-
-function fillRecs(){
-
-  const recs =
-    activeRecruiters();
-
-
-  fRec.innerHTML =
-
-    recs
-      .map(
-        r=>`<option>${r}</option>`
-      )
-      .join('')
-
-    +
-
-    `<option value="__new">
-      ➕ New recruiter…
-    </option>`;
-
-}
-
-
-fRec.onchange = () =>
-
-  document
-    .getElementById('newRecWrap')
-    .classList
-    .toggle(
-      'show',
-      fRec.value === '__new'
-    );
-
-
-/* =========================
-   PENDING PREVIEW
-========================= */
-
-function updatePrev(){
-
-  const fee =
-    +document
-      .getElementById('fFee')
-      .value || 0;
-
-
-  const paid =
-    +document
-      .getElementById('fPaid')
-      .value || 0;
-
-
-  const pend =
-    Math.max(
-      0,
-      fee-paid
-    );
-
-
-  document.getElementById('pendPrev').innerHTML =
-
-    pend > 0
-
-      ?
-
-      `Pending:
-       <b class="due">
-         ${inr(pend)}
-       </b>`
-
-      :
-
-      `<b class="clr">
-        ✓ Paid in full — nothing pending
-      </b>`;
-
-}
-
-
-document.getElementById('fFee').oninput =
-  updatePrev;
-
-document.getElementById('fPaid').oninput =
-  updatePrev;
-
-
-/* =========================
-   ADD CANDIDATE
-========================= */
-
-document.getElementById('addBtn').onclick =
-async () => {
-
-  let rec =
-    fRec.value;
-
-
-  if(rec === '__new'){
-
-    rec =
-      document
-        .getElementById('fNewRec')
-        .value
-        .trim();
-
-
-    if(!rec){
-
-      toast(
-        'Enter recruiter name',
-        true
-      );
-
-      return;
+  const openSet=new Set([...document.querySelectorAll('.rec.open')].map(e=>e.dataset.r));
+  document.getElementById('recList').innerHTML = R.map(r=>{
+    const pct=r.total?Math.round(r.full/r.total*100):0;
+    const rows=r.remaining_list.sort((a,b)=>b.pending-a.pending).map(st=>
+      `<div class="stu"><span class="snm">${st.name}</span><span class="paid">₹${st.paid.toLocaleString('en-IN')} paid</span><span class="owe">₹${st.pending.toLocaleString('en-IN')}</span><button class="pay" data-pay="${st.id}">✏️ Update</button><button class="rcpt" data-rcpt="${st.id}">🧾 Receipt</button><button class="del" data-delid="${st.id}" title="Delete candidate">×</button></div>`).join('');
+    const fulls=r.full_list.map(st=>
+      `<div class="stu"><span class="snm">${st.name}</span><span class="paid">₹${st.paid.toLocaleString('en-IN')} paid</span><span class="full">✓ full</span><button class="pay" data-pay="${st.id}">✏️ Update</button><button class="rcpt" data-rcpt="${st.id}">🧾 Receipt</button><button class="del" data-delid="${st.id}" title="Delete candidate">×</button></div>`).join('');
+    const body=(rows+fulls)||`<div class="none">No candidates yet — add one above</div>`;
+    let head;
+    if(pendingDeleteRec===r.recruiter){
+      head=`<span class="warn">Delete “${r.recruiter}”${r.total?` and ${r.total} candidate(s)`:''}?</span>
+        <button class="cfm yes" data-rdelyes="${r.recruiter}">Delete</button>
+        <button class="cfm no" data-rdelno="1">Cancel</button>`;
+    } else {
+      head=`<div class="mini"><i style="width:${pct}%"></i></div>
+        <div class="nm">${r.recruiter}</div>
+        <div class="stat">${r.full}/${r.total} full · <b style="color:var(--rem)">${r.remaining} owe</b></div>
+        <div class="amt">${r.pending_amt>0?inr(r.pending_amt):'—'}</div>
+        <button class="rdel" data-rdel="${r.recruiter}" title="Remove recruiter">🗑</button>
+        <div class="chev">▶</div>`;
     }
+    return `<div class="rec ${openSet.has(r.recruiter)?'open':''}" data-r="${r.recruiter}"><div class="head">${head}</div><div class="body">${body}</div></div>`;
+  }).join('');
 
-  }
-
-
-  const name =
-    document
-      .getElementById('fName')
-      .value
-      .trim();
-
-
-  if(!name){
-
-    toast(
-      'Enter candidate name',
-      true
-    );
-
-    return;
-
-  }
-
-
-  const fee =
-    +document
-      .getElementById('fFee')
-      .value ||
-    FEE_DEFAULT;
-
-
-  const paid =
-    +document
-      .getElementById('fPaid')
-      .value ||
-    0;
-
-
-  const btn =
-    document.getElementById('addBtn');
-
-
-  btn.disabled = true;
-
-
-  try{
-
-    await api(
-      '/api/students',
-      {
-        method:'POST',
-
-        body:JSON.stringify({
-          recruiter:rec,
-          name,
-          fee,
-          paid
-        })
-      }
-    );
-
-
-    document
-      .getElementById('fName')
-      .value = '';
-
-
-    document
-      .getElementById('fPaid')
-      .value = '';
-
-
-    document
-      .getElementById('fNewRec')
-      .value = '';
-
-
-    document
-      .getElementById('newRecWrap')
-      .classList
-      .remove('show');
-
-
-    updatePrev();
-
-
-    await loadData();
-
-
-    fRec.value = rec;
-
-
-    render(true);
-
-
-    toast(
-      'Added ' +
-      name +
-      ' → ' +
-      rec
-    );
-
-
-  }catch(e){
-
-    toast(
-      e.message,
-      true
-    );
-
-  }
-
-
-  btn.disabled = false;
-
-};
-
-
-/* =========================
-   ADD RECRUITER
-========================= */
-
-document.getElementById('addRecBtn').onclick =
-async () => {
-
-  const r =
-    document
-      .getElementById('fAddRec')
-      .value
-      .trim();
-
-
-  if(!r){
-
-    toast(
-      'Enter recruiter name',
-      true
-    );
-
-    return;
-
-  }
-
-
-  if(
-    activeRecruiters()
-      .includes(r)
-  ){
-
-    toast(
-      r+' already exists',
-      true
-    );
-
-    return;
-
-  }
-
-
-  try{
-
-    await api(
-      '/api/recruiters',
-      {
-        method:'POST',
-
-        body:JSON.stringify({
-          name:r
-        })
-      }
-    );
-
-
-    document
-      .getElementById('fAddRec')
-      .value = '';
-
-
-    await loadData();
-
-
-    toast(
-      'Added recruiter '+r
-    );
-
-
-  }catch(e){
-
-    toast(
-      e.message,
-      true
-    );
-
-  }
-
-};
-
-
-/* =========================
-   TOAST
-========================= */
-
-let toastT;
-
-
-function toast(m,isErr){
-
-  const t =
-    document.getElementById('toast');
-
-
-  t.textContent = m;
-
-
-  t.classList.toggle(
-    'err',
-    !!isErr
-  );
-
-
-  t.classList.add('show');
-
-
-  clearTimeout(toastT);
-
-
-  toastT =
-    setTimeout(
-      ()=>t.classList.remove('show'),
-      1900
-    );
-
+  document.getElementById('foot').innerHTML=`${inr(totP)} outstanding · ${totR} owe · ${totS} students · ${R.length} recruiters<br>Live — synced to the server, visible from any device.`;
 }
 
+const fRec=document.getElementById('fRec');
+function fillRecs(){
+  const recs=activeRecruiters();
+  fRec.innerHTML=recs.map(r=>`<option>${r}</option>`).join('')+'<option value="__new">➕ New recruiter…</option>';
+}
+fRec.onchange=()=>document.getElementById('newRecWrap').classList.toggle('show',fRec.value==='__new');
+function updatePrev(){
+  const fee=+document.getElementById('fFee').value||0, paid=+document.getElementById('fPaid').value||0;
+  const pend=Math.max(0,fee-paid);
+  document.getElementById('pendPrev').innerHTML = pend>0 ? `Pending: <b class="due">${inr(pend)}</b>` : `<b class="clr">✓ Paid in full — nothing pending</b>`;
+}
+document.getElementById('fFee').oninput=updatePrev;
+document.getElementById('fPaid').oninput=updatePrev;
 
-/* =========================
-   DELETE CANDIDATE
-========================= */
+document.getElementById('addBtn').onclick=async ()=>{
+  let rec=fRec.value;
+  if(rec==='__new'){ rec=document.getElementById('fNewRec').value.trim(); if(!rec){toast('Enter recruiter name',true);return;} }
+  const name=document.getElementById('fName').value.trim();
+  if(!name){ toast('Enter candidate name',true); return; }
+  const fee=+document.getElementById('fFee').value||FEE_DEFAULT;
+  const paid=+document.getElementById('fPaid').value||0;
+  const btn=document.getElementById('addBtn'); btn.disabled=true;
+  try{
+    await api('/api/students',{method:'POST',body:JSON.stringify({recruiter:rec,name,fee,paid})});
+    document.getElementById('fName').value=''; document.getElementById('fPaid').value='';
+    document.getElementById('fNewRec').value=''; document.getElementById('newRecWrap').classList.remove('show');
+    updatePrev();
+    await loadData();
+    fRec.value=rec;
+    render(true); toast('Added '+name+' → '+rec);
+  }catch(e){ toast(e.message,true); }
+  btn.disabled=false;
+};
+document.getElementById('addRecBtn').onclick=async ()=>{
+  const r=document.getElementById('fAddRec').value.trim();
+  if(!r){toast('Enter recruiter name',true);return;}
+  if(activeRecruiters().includes(r)){toast(r+' already exists',true);return;}
+  try{
+    await api('/api/recruiters',{method:'POST',body:JSON.stringify({name:r})});
+    document.getElementById('fAddRec').value='';
+    await loadData();
+    toast('Added recruiter '+r);
+  }catch(e){ toast(e.message,true); }
+};
+let toastT; function toast(m,isErr){const t=document.getElementById('toast');t.textContent=m;t.classList.toggle('err',!!isErr);t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),1900);}
 
 async function deleteCandidate(id){
-
-  const st =
-    DB.students.find(
-      s=>s.id===id
-    );
-
-
+  const st=DB.students.find(s=>s.id===id);
   try{
-
-    await api(
-      '/api/students/'+id,
-      {
-        method:'DELETE'
-      }
-    );
-
-
+    await api('/api/students/'+id,{method:'DELETE'});
     await loadData();
-
-
-    toast(
-      'Removed ' +
-      (st
-        ? st.name
-        : 'candidate')
-    );
-
-
-  }catch(e){
-
-    toast(
-      e.message,
-      true
-    );
-
-  }
-
+    toast('Removed '+(st?st.name:'candidate'));
+  }catch(e){ toast(e.message,true); }
 }
-
-
-/* =========================
-   DELETE RECRUITER
-========================= */
-
 async function deleteRecruiter(r){
-
   try{
-
-    await api(
-      '/api/recruiters/' +
-      encodeURIComponent(r),
-      {
-        method:'DELETE'
-      }
-    );
-
-
-    pendingDeleteRec = null;
-
-
+    await api('/api/recruiters/'+encodeURIComponent(r),{method:'DELETE'});
+    pendingDeleteRec=null;
     await loadData();
-
-
-    toast(
-      'Removed recruiter '+r
-    );
-
-
-  }catch(e){
-
-    toast(
-      e.message,
-      true
-    );
-
-  }
-
+    toast('Removed recruiter '+r);
+  }catch(e){ toast(e.message,true); }
 }
 
+document.getElementById('recList').addEventListener('click',(e)=>{
+  const pay=e.target.closest('[data-pay]');
+  if(pay){ e.stopPropagation(); openPayModal(pay.getAttribute('data-pay')); return; }
+  const rcpt=e.target.closest('[data-rcpt]');
+  if(rcpt){ e.stopPropagation(); openReceipt(rcpt.getAttribute('data-rcpt')); return; }
+  const del=e.target.closest('[data-delid]');
+  if(del){ e.stopPropagation(); deleteCandidate(del.getAttribute('data-delid')); return; }
+  const yes=e.target.closest('[data-rdelyes]');
+  if(yes){ e.stopPropagation(); deleteRecruiter(yes.getAttribute('data-rdelyes')); return; }
+  const no=e.target.closest('[data-rdelno]');
+  if(no){ e.stopPropagation(); pendingDeleteRec=null; render(); return; }
+  const rdel=e.target.closest('[data-rdel]');
+  if(rdel){ e.stopPropagation(); pendingDeleteRec=rdel.getAttribute('data-rdel'); render(); return; }
+  const head=e.target.closest('.head');
+  if(head){ head.parentElement.classList.toggle('open'); }
+});
 
-/* =========================
-   RECRUITER LIST EVENTS
-========================= */
-
-document
-  .getElementById('recList')
-  .addEventListener(
-    'click',
-    (e)=>{
-
-      const pay =
-        e.target.closest(
-          '[data-pay]'
-        );
-
-
-      if(pay){
-
-        e.stopPropagation();
-
-        openPayModal(
-          pay.getAttribute(
-            'data-pay'
-          )
-        );
-
-        return;
-
-      }
-
-
-      const rcpt =
-        e.target.closest(
-          '[data-rcpt]'
-        );
-
-
-      if(rcpt){
-
-        e.stopPropagation();
-
-        openReceipt(
-          rcpt.getAttribute(
-            'data-rcpt'
-          )
-        );
-
-        return;
-
-      }
-
-
-      const del =
-        e.target.closest(
-          '[data-delid]'
-        );
-
-
-      if(del){
-
-        e.stopPropagation();
-
-        deleteCandidate(
-          del.getAttribute(
-            'data-delid'
-          )
-        );
-
-        return;
-
-      }
-
-
-      const yes =
-        e.target.closest(
-          '[data-rdelyes]'
-        );
-
-
-      if(yes){
-
-        e.stopPropagation();
-
-        deleteRecruiter(
-          yes.getAttribute(
-            'data-rdelyes'
-          )
-        );
-
-        return;
-
-      }
-
-
-      const no =
-        e.target.closest(
-          '[data-rdelno]'
-        );
-
-
-      if(no){
-
-        e.stopPropagation();
-
-        pendingDeleteRec = null;
-
-        render();
-
-        return;
-
-      }
-
-
-      const rdel =
-        e.target.closest(
-          '[data-rdel]'
-        );
-
-
-      if(rdel){
-
-        e.stopPropagation();
-
-        pendingDeleteRec =
-          rdel.getAttribute(
-            'data-rdel'
-          );
-
-        render();
-
-        return;
-
-      }
-
-
-      const head =
-        e.target.closest(
-          '.head'
-        );
-
-
-      if(head){
-
-        head.parentElement
-          .classList
-          .toggle('open');
-
-      }
-
-    }
-  );
-
-
-/* =========================
-   UPDATE PAYMENT MODAL
-========================= */
-
+// ---- Update payment (record a new payment against a candidate) ----
 function openPayModal(id){
-
-  const st =
-    DB.students.find(
-      s=>s.id===id
-    );
-
-
-  if(!st){
-
-    toast(
-      'Candidate not found',
-      true
-    );
-
-    return;
-
-  }
-
-
-  document.getElementById('payCard').innerHTML =
-
-    `<h3>
-      Update payment
-    </h3>
-
-    <div class="sub">
-      ${st.name} · ${st.recruiter}
-    </div>
-
+  const st=DB.students.find(s=>s.id===id);
+  if(!st){ toast('Candidate not found',true); return; }
+  document.getElementById('payCard').innerHTML=`
+    <h3>Update payment</h3>
+    <div class="sub">${st.name} · ${st.recruiter}</div>
     <div class="payStats">
-
-      <div>
-        <div class="l">
-          Fee
-        </div>
-
-        <div class="v">
-          ${inr(st.fee)}
-        </div>
-      </div>
-
-
-      <div>
-
-        <div class="l">
-          Paid
-        </div>
-
-        <div
-          class="v"
-          style="color:var(--full)"
-        >
-          ${inr(st.paid)}
-        </div>
-
-      </div>
-
-
-      <div>
-
-        <div class="l">
-          Pending
-        </div>
-
-        <div
-          class="v"
-          style="color:var(--pend)"
-        >
-          ${inr(st.pending)}
-        </div>
-
-      </div>
-
+      <div><div class="l">Fee</div><div class="v">${inr(st.fee)}</div></div>
+      <div><div class="l">Paid</div><div class="v" style="color:var(--full)">${inr(st.paid)}</div></div>
+      <div><div class="l">Pending</div><div class="v" style="color:var(--pend)">${inr(st.pending)}</div></div>
     </div>
-
-
     <div class="payField">
-
-      <label>
-        Amount received now (₹)
-      </label>
-
-      <input
-        type="number"
-        id="payAmt"
-        placeholder="e.g. 2000"
-        inputmode="numeric"
-        autofocus
-      >
-
-
+      <label>Amount received now (₹)</label>
+      <input type="number" id="payAmt" placeholder="e.g. 2000" inputmode="numeric" autofocus>
       <div class="payQuick">
-
-        ${
-          st.pending>0
-            ?
-
-            `<button
-              type="button"
-              data-quick="${st.pending}">
-              Clear full due
-              (${inr(st.pending)})
-            </button>`
-
-            :
-
-            ''
-        }
-
-
-        <button
-          type="button"
-          data-quick="1000">
-          +₹1,000
-        </button>
-
-
-        <button
-          type="button"
-          data-quick="2500">
-          +₹2,500
-        </button>
-
-
-        <button
-          type="button"
-          data-quick="5000">
-          +₹5,000
-        </button>
-
+        ${st.pending>0?`<button type="button" data-quick="${st.pending}">Clear full due (${inr(st.pending)})</button>`:''}
+        <button type="button" data-quick="1000">+₹1,000</button>
+        <button type="button" data-quick="2500">+₹2,500</button>
+        <button type="button" data-quick="5000">+₹5,000</button>
       </div>
-
     </div>
-
-
     <div class="payBtns">
-
-      <button
-        class="cancel"
-        id="payCancel">
-        Cancel
-      </button>
-
-
-      <button
-        class="save"
-        id="paySave">
-        Save payment
-      </button>
-
-    </div>`;
-
-
-  document
-    .getElementById('payOverlay')
-    .classList
-    .add('show');
-
-
-  const amtInput =
-    document.getElementById(
-      'payAmt'
-    );
-
-
-  document
-    .getElementById('payCard')
-    .querySelectorAll(
-      '[data-quick]'
-    )
-    .forEach(b=>{
-
-      b.onclick = () => {
-
-        amtInput.value =
-          b.getAttribute(
-            'data-quick'
-          );
-
-        amtInput.focus();
-
-      };
-
-    });
-
-
-  document
-    .getElementById('payCancel')
-    .onclick = () =>
-      document
-        .getElementById('payOverlay')
-        .classList
-        .remove('show');
-
-
-  document
-    .getElementById('paySave')
-    .onclick =
-    async ()=>{
-
-      const amt =
-        +amtInput.value;
-
-
-      if(!amt || amt<=0){
-
-        toast(
-          'Enter an amount greater than 0',
-          true
-        );
-
-        return;
-
-      }
-
-
-      try{
-
-        await api(
-          '/api/students/'+id+'/payment',
-          {
-            method:'PATCH',
-
-            body:JSON.stringify({
-              amount:amt
-            })
-          }
-        );
-
-
-        document
-          .getElementById('payOverlay')
-          .classList
-          .remove('show');
-
-
-        await loadData();
-
-
-        render(true);
-
-
-        toast(
-          'Payment updated for '+
-          st.name
-        );
-
-
-      }catch(e){
-
-        toast(
-          e.message,
-          true
-        );
-
-      }
-
-    };
-
-}
-
-
-document
-  .getElementById('payOverlay')
-  .addEventListener(
-    'click',
-    (e)=>{
-
-      if(
-        e.target.id ===
-        'payOverlay'
-      ){
-
-        e.target
-          .classList
-          .remove('show');
-
-      }
-
-    }
-  );
-
-
-/* =========================
-   RECEIPT
-========================= */
-
-async function openReceipt(id){
-
-  let r;
-
-
-  try{
-
-    r =
-      await api(
-        '/api/receipt/'+id
-      );
-
-  }catch(e){
-
-    toast(
-      e.message,
-      true
-    );
-
-    return;
-
-  }
-
-
-  const dt =
-    new Date(r.date);
-
-
-  const dateStr =
-    dt.toLocaleDateString(
-      'en-IN',
-      {
-        day:'2-digit',
-        month:'short',
-        year:'numeric'
-      }
-    );
-
-
-  const statusHtml =
-    r.pending > 0
-
-      ?
-
-      `<div class="rstatus due">
-        Balance due:
-        ${inr(r.pending)}
-      </div>`
-
-      :
-
-      `<div class="rstatus full">
-        ✓ Paid in full
-      </div>`;
-
-
-  document
-    .getElementById('rcptCard')
-    .innerHTML =
-
-    `<div class="rcptHead">
-
-      <img
-        src="/assets/logo.jpg"
-        alt="3DWebSoft Foundation"
-      >
-
-      <div class="txt">
-
-        <div class="co">
-          3DWEBSOFT FOUNDATION PVT LTD
-        </div>
-
-        <div class="meta">
-
-          Door No.46-1,
-          Near Saibaba,
-          Muppa Road,
-          Narsingi,
-          Rangareddy District,
-          Telangana - 500089
-
-          <br>
-
-          CIN:
-          U85499TS2026NPL220500
-          &nbsp;|&nbsp;
-
-          GSTIN:
-          36AADCT2232B1ZT
-
-          <br>
-
-          Ph:
-          9108534041
-          &nbsp;|&nbsp;
-
-          info@3dwebsoftfoundation.org
-
-        </div>
-
-      </div>
-
+      <button class="cancel" id="payCancel">Cancel</button>
+      <button class="save" id="paySave">Save payment</button>
     </div>
+  `;
+  document.getElementById('payOverlay').classList.add('show');
+  const amtInput=document.getElementById('payAmt');
+  document.getElementById('payCard').querySelectorAll('[data-quick]').forEach(b=>{
+    b.onclick=()=>{ amtInput.value=b.getAttribute('data-quick'); amtInput.focus(); };
+  });
+  document.getElementById('payCancel').onclick=()=>document.getElementById('payOverlay').classList.remove('show');
+  document.getElementById('paySave').onclick=async ()=>{
+    const amt=+amtInput.value;
+    if(!amt || amt<=0){ toast('Enter an amount greater than 0',true); return; }
+    try{
+      await api('/api/students/'+id+'/payment',{method:'PATCH',body:JSON.stringify({amount:amt})});
+      document.getElementById('payOverlay').classList.remove('show');
+      await loadData();
+      render(true);
+      toast('Payment updated for '+st.name);
+    }catch(e){ toast(e.message,true); }
+  };
+}
+document.getElementById('payOverlay').addEventListener('click',(e)=>{
+  if(e.target.id==='payOverlay') e.target.classList.remove('show');
+});
 
-
+// ---- Receipt generator (18% GST) ----
+async function openReceipt(id){
+  let r;
+  try{ r = await api('/api/receipt/'+id); }
+  catch(e){ toast(e.message,true); return; }
+  const dt = new Date(r.date);
+  const dateStr = dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  const statusHtml = r.pending>0
+    ? `<div class="rstatus due">Balance due: ${inr(r.pending)}</div>`
+    : `<div class="rstatus full">✓ Paid in full</div>`;
+  document.getElementById('rcptCard').innerHTML = `
+    <div class="rcptHead">
+      <img src="/assets/logo.jpg" alt="3DWebSoft Foundation">
+      <div class="txt">
+        <div class="co">3DWEBSOFT FOUNDATION PVT LTD</div>
+        <div class="meta">
+          Door No.46-1, Near Saibaba, Muppa Road, Narsingi, Rangareddy District, Telangana - 500089<br>
+          CIN: U85499TS2026NPL220500 &nbsp;|&nbsp; GSTIN: 36AADCT2232B1ZT<br>
+          Ph: 9108534041 &nbsp;|&nbsp; info@3dwebsoftfoundation.org
+        </div>
+      </div>
+    </div>
     <div class="rcptBody">
-
-      <div class="rcptTitle">
-
-        <b>
-          Fee Receipt
-        </b>
-
-        <span>
-          ${r.receiptNo}
-          ·
-          ${dateStr}
-        </span>
-
-      </div>
-
-
-      <div class="rrow">
-
-        <span class="lbl">
-          Candidate
-        </span>
-
-        <span>
-          ${r.candidate}
-        </span>
-
-      </div>
-
-
-      <div class="rrow">
-
-        <span class="lbl">
-          Recruiter
-        </span>
-
-        <span>
-          ${r.recruiter}
-        </span>
-
-      </div>
-
+      <div class="rcptTitle"><b>Fee Receipt</b><span>${r.receiptNo} · ${dateStr}</span></div>
+      <div class="rrow"><span class="lbl">Candidate</span><span>${r.candidate}</span></div>
+      <div class="rrow"><span class="lbl">Recruiter</span><span>${r.recruiter}</span></div>
 
       <div class="rgroup">
-
-        <h4>
-          Course fee breakup (incl. 18% GST)
-        </h4>
-
-
-        <div class="rrow">
-
-          <span class="lbl">
-            Taxable value
-          </span>
-
-          <span>
-            ${inr(r.taxableTotal)}
-          </span>
-
-        </div>
-
-
-        <div class="rrow">
-
-          <span class="lbl">
-            CGST @ 9%
-          </span>
-
-          <span>
-            ${inr(r.cgstTotal)}
-          </span>
-
-        </div>
-
-
-        <div class="rrow">
-
-          <span class="lbl">
-            SGST @ 9%
-          </span>
-
-          <span>
-            ${inr(r.sgstTotal)}
-          </span>
-
-        </div>
-
-
-        <div class="rrow tot">
-
-          <span>
-            Total course fee
-          </span>
-
-          <span>
-            ${inr(r.fee)}
-          </span>
-
-        </div>
-
+        <h4>Course fee breakup (incl. 18% GST)</h4>
+        <div class="rrow"><span class="lbl">Taxable value</span><span>${inr(r.taxableTotal)}</span></div>
+        <div class="rrow"><span class="lbl">CGST @ 9%</span><span>${inr(r.cgstTotal)}</span></div>
+        <div class="rrow"><span class="lbl">SGST @ 9%</span><span>${inr(r.sgstTotal)}</span></div>
+        <div class="rrow tot"><span>Total course fee</span><span>${inr(r.fee)}</span></div>
       </div>
-
 
       <div class="rgroup">
-
-        <h4>
-          Payment received so far
-        </h4>
-
-
-        <div class="rrow">
-
-          <span class="lbl">
-            Taxable value paid
-          </span>
-
-          <span>
-            ${inr(r.taxablePaid)}
-          </span>
-
-        </div>
-
-
-        <div class="rrow">
-
-          <span class="lbl">
-            CGST @ 9% paid
-          </span>
-
-          <span>
-            ${inr(r.cgstPaid)}
-          </span>
-
-        </div>
-
-
-        <div class="rrow">
-
-          <span class="lbl">
-            SGST @ 9% paid
-          </span>
-
-          <span>
-            ${inr(r.sgstPaid)}
-          </span>
-
-        </div>
-
-
-        <div class="rrow tot">
-
-          <span>
-            Total amount paid
-          </span>
-
-          <span>
-            ${inr(r.paid)}
-          </span>
-
-        </div>
-
+        <h4>Payment received so far</h4>
+        <div class="rrow"><span class="lbl">Taxable value paid</span><span>${inr(r.taxablePaid)}</span></div>
+        <div class="rrow"><span class="lbl">CGST @ 9% paid</span><span>${inr(r.cgstPaid)}</span></div>
+        <div class="rrow"><span class="lbl">SGST @ 9% paid</span><span>${inr(r.sgstPaid)}</span></div>
+        <div class="rrow tot"><span>Total amount paid</span><span>${inr(r.paid)}</span></div>
       </div>
-
 
       ${statusHtml}
-
     </div>
-
-
     <div class="rbtns">
-
-      <button
-        class="close"
-        id="rcptClose">
-        Close
-      </button>
-
-      <button
-        class="print"
-        id="rcptPrint">
-        🖨 Print / Save PDF
-      </button>
-
-    </div>`;
-
-
-  document
-    .getElementById('rcptOverlay')
-    .classList
-    .add('show');
-
-
-  document
-    .getElementById('rcptClose')
-    .onclick = () =>
-      document
-        .getElementById('rcptOverlay')
-        .classList
-        .remove('show');
-
-
-  document
-    .getElementById('rcptPrint')
-    .onclick =
-      () => window.print();
-
+      <button class="close" id="rcptClose">Close</button>
+      <button class="print" id="rcptPrint">🖨 Print / Save PDF</button>
+    </div>
+  `;
+  document.getElementById('rcptOverlay').classList.add('show');
+  document.getElementById('rcptClose').onclick=()=>document.getElementById('rcptOverlay').classList.remove('show');
+  document.getElementById('rcptPrint').onclick=()=>window.print();
 }
-
-
-document
-  .getElementById('rcptOverlay')
-  .addEventListener(
-    'click',
-    (e)=>{
-
-      if(
-        e.target.id ===
-        'rcptOverlay'
-      ){
-
-        e.target
-          .classList
-          .remove('show');
-
-      }
-
-    }
-  );
-
-
-/* =========================
-   INITIAL LOAD
-========================= */
+document.getElementById('rcptOverlay').addEventListener('click',(e)=>{
+  if(e.target.id==='rcptOverlay') e.target.classList.remove('show');
+});
 
 updatePrev();
-
 loadData();
-
 </script>
-
 </body>
 </html>
